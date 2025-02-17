@@ -51,6 +51,7 @@ app.get("/twitter/:username", async (req, res) => {
 });
 
 // ✅ Lancer le serveur après avoir bien défini toutes les routes et middleware
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur proxy en écoute sur http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Serveur proxy en écoute sur PORT: ${PORT}`);
 });
+

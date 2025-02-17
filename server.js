@@ -42,13 +42,8 @@ app.listen(PORT, () => {
   console.log(`🚀 Serveur proxy en écoute sur http://localhost:${PORT}`);
 });
 
-const express = require("express");
-const fetch = require("node-fetch");
-const cors = require("cors");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-const GOOGLE_API_KEY = "VOTRE_CLE_API";
+const GOOGLE_API_KEY = process.env.GOOGLE_TOKEN;;
 
 app.use(cors());
 

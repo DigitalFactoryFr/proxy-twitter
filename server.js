@@ -81,8 +81,3 @@ app.get("/api/get-reviews", async (req, res) => {
   }
 });
 
-// Démarrer le serveur si ce n’est pas déjà fait
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
-});
-

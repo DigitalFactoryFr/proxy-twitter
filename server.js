@@ -41,3 +41,53 @@ app.get("/twitter/:username", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Serveur proxy en écoute sur http://localhost:${PORT}`);
 });
+
+const express = require("express");
+const fetch = require("node-fetch");
+const cors = require("cors");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const GOOGLE_API_KEY = "VOTRE_CLE_API";
+
+app.use(cors());
+
+// Route pour récupérer le Place ID à partir du site web
+app.get("/api/get-place-id", async (req, res) => {
+  const siteInternet = req.query.siteInternet;
+  if (!siteInternet) {
+    return res.status(400).json({ error: "URL requise" });
+  }
+
+  try {
+    const placeSearchUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(siteInternet)}&inputtype=textquery&fields=name,place_id,formatted_address&key=${GOOGLE_API_KEY}`;
+    const response = await fetch(placeSearchUrl);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur API Google" });
+  }
+});
+
+// Route pour récupérer les avis Google à partir du Place ID
+app.get("/api/get-reviews", async (req, res) => {
+  const placeId = req.query.placeId;
+  if (!placeId) {
+    return res.status(400).json({ error: "Place ID requis" });
+  }
+
+  try {
+    const placeDetailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=name,reviews&key=${GOOGLE_API_KEY}`;
+    const response = await fetch(placeDetailsUrl);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur API Google" });
+  }
+});
+
+// Démarrer le serveur si ce n’est pas déjà fait
+app.listen(PORT, () => {
+  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+});
+

@@ -25,6 +25,9 @@ app.get("/twitter/:username", async (req, res) => {
   const url = `https://api.twitter.com/2/users/by/username/${username}?user.fields=public_metrics`;
 
   try {
+
+console.log("🔑 Bearer Token utilisé :", process.env.BEARER_TOKEN);
+
     const response = await fetch(url, {
       method: "GET",
       headers: {

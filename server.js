@@ -3,7 +3,7 @@ app.get("/twitter/:username", async (req, res) => {
   const url = `https://api.twitter.com/2/users/by/username/${username}`;
 
   try {
-    console.log(`🔄 Requête API Twitter pour : ${username}...`);
+    console.log(`🔄 Requête API Twitter pour : ${username}`);
 
     const response = await fetch(url, {
       method: "GET",

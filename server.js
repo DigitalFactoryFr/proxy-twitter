@@ -1,3 +1,13 @@
+const express = require("express");
+const fetch = require("node-fetch");
+const cors = require("cors");
+
+const app = express(); // 📌 C'est ici que l'application Express est initialisée
+const PORT = process.env.PORT || 5000;
+const bearerToken = process.env.BEARER_TOKEN; // Assurez-vous que ce token est bien défini
+
+app.use(cors());
+
 app.get("/twitter/:username", async (req, res) => {
   const username = req.params.username;
   const url = `https://api.twitter.com/2/users/by/username/${username}`;
@@ -8,7 +18,7 @@ app.get("/twitter/:username", async (req, res) => {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${process.env.BEARER_TOKEN}`,
+        "Authorization": `Bearer ${bearerToken}`,
         "Content-Type": "application/json"
       }
     });
@@ -25,4 +35,9 @@ app.get("/twitter/:username", async (req, res) => {
     console.error("❌ Erreur API Twitter :", error);
     res.status(500).json({ error: "Erreur serveur", details: error.message });
   }
+});
+
+// 📌 Ajoute ceci pour lancer ton serveur
+app.listen(PORT, () => {
+  console.log(`🚀 Serveur proxy en écoute sur http://localhost:${PORT}`);
 });

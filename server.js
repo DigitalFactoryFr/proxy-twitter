@@ -52,6 +52,19 @@ console.log("🔑 Bearer Token utilisé :", process.env.BEARER_TOKEN);
   }
 });
 
+
+app.get("/test-twitter", async (req, res) => {
+  try {
+    const response = await fetch("https://api.twitter.com/2/tweets?ids=123", {
+      method: "GET",
+      headers: { "Authorization": `Bearer ${process.env.BEARER_TOKEN}` }
+    });
+    res.status(response.status).json(await response.json());
+  } catch (error) {
+    res.status(500).json({ error: "Échec de connexion", details: error.message });
+  }
+});
+
 // ✅ Lancer le serveur après avoir bien défini toutes les routes et middleware
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Serveur proxy en écoute sur PORT: ${PORT}`);

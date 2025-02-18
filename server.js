@@ -1,15 +1,14 @@
+const cache = require("memory-cache"); // Cache pour éviter trop de requêtes
 require("dotenv").config();
 const express = require("express");
 const fetch = require("node-fetch");
 const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT; // Render gère le port automatiquement
+const PORT = process.env.PORT;
 const BEARER_TOKEN = process.env.BEARER_TOKEN;
 
-// ✅ Activer CORS pour toutes les requêtes
 app.use(cors({ origin: "*" }));
-console.log("✅ CORS activé pour toutes les origines");
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "https://digitalfactory.store");
@@ -18,37 +17,59 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Vérifier si le BEARER_TOKEN est chargé correctement
-app.get("/test-env", (req, res) => {
-  res.json({ 
-    bearerToken: BEARER_TOKEN ? "OK" : "NON DEFINI"
-  });
-});
+/**
+ * 🔹 1) Récupérer le compte Twitter depuis un site web
+ */
+app.get("/twitter-from-website", async (req, res) => {
+  const siteInternet = req.query.siteInternet;
+  if (!siteInternet) {
+    return res.status(400).json({ error: "URL du site requise" });
+  }
 
-// ✅ Vérifier si Render peut contacter Twitter
-app.get("/test-twitter", async (req, res) => {
+  // Vérifier si l'info est en cache
+  let cachedData = cache.get(siteInternet);
+  if (cachedData) {
+    console.log("⚡ Récupération du cache pour Twitter");
+    return res.json(cachedData);
+  }
+
   try {
-    const response = await fetch("https://api.twitter.com/2/tweets?ids=123", {
-      method: "GET",
-      headers: { "Authorization": `Bearer ${BEARER_TOKEN}` }
-    });
-    const data = await response.json();
-    console.log("📢 Réponse de Twitter:", JSON.stringify(data, null, 2));
-    res.status(response.status).json(data);
+    // Scraper la page web pour trouver un lien Twitter
+    const response = await fetch("https://corsproxy.io/?" + encodeURIComponent(siteInternet));
+    const html = await response.text();
+    
+    const twitterMatch = html.match(/https:\/\/twitter\.com\/([a-zA-Z0-9_]+)/);
+    
+    if (!twitterMatch || !twitterMatch[1]) {
+      return res.status(404).json({ error: "Aucun compte Twitter trouvé sur ce site." });
+    }
+
+    const twitterUsername = twitterMatch[1];
+    console.log(`🔍 Compte Twitter détecté : ${twitterUsername}`);
+
+    // Récupérer les abonnés Twitter
+    const twitterData = await fetchTwitterFollowers(twitterUsername);
+    if (!twitterData) {
+      return res.status(500).json({ error: "Impossible de récupérer les abonnés Twitter." });
+    }
+
+    // Sauvegarde dans le cache (1 heure)
+    const result = { username: twitterUsername, abonnés: twitterData };
+    cache.put(siteInternet, result, 3600000);
+    res.json(result);
   } catch (error) {
-    console.error("❌ Erreur API Twitter :", error);
-    res.status(500).json({ error: "Échec de connexion", details: error.message });
+    console.error("❌ Erreur de scraping :", error);
+    res.status(500).json({ error: "Erreur serveur lors du scraping." });
   }
 });
 
-// ✅ Récupérer les infos d’un utilisateur Twitter
-app.get("/twitter/:username", async (req, res) => {
-  const username = req.params.username;
+/**
+ * 🔹 2) Récupérer les abonnés d’un compte Twitter
+ */
+async function fetchTwitterFollowers(username) {
   const url = `https://api.twitter.com/2/users/by/username/${username}?user.fields=public_metrics`;
 
   try {
-    console.log(`🔍 Recherche de l'utilisateur : ${username}`);
-
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -58,29 +79,22 @@ app.get("/twitter/:username", async (req, res) => {
     });
 
     const data = await response.json();
-    console.log("📢 Réponse complète de Twitter :", JSON.stringify(data, null, 2));
-
     if (data.data) {
-      res.json({
-        id: data.data.id,
-        name: data.data.name,
-        username: data.data.username,
-        abonnés: data.data.public_metrics.followers_count,
-      });
+      return data.data.public_metrics.followers_count;
     } else {
-      console.log("⚠️ Aucun utilisateur trouvé. Réponse de Twitter :", data);
-      res.status(404).json({ error: "Utilisateur non trouvé", details: data });
+      return null;
     }
   } catch (error) {
     console.error("❌ Erreur API Twitter :", error);
-    res.status(500).json({ error: "Erreur serveur", details: error.message });
+    return null;
   }
-});
+}
 
 // ✅ Lancer le serveur
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Serveur proxy en écoute sur PORT: ${PORT}`);
 });
+
 
 
 

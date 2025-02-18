@@ -37,6 +37,14 @@ app.get("/twitter/:username", async (req, res) => {
   }
 });
 
+const limitUrl = "https://api.twitter.com/2/tweets?ids=123"; // Un ID bidon
+const limitResponse = await fetch(limitUrl, {
+  method: "GET",
+  headers: { "Authorization": `Bearer ${bearerToken}` }
+});
+console.log("Headers API Twitter:", limitResponse.headers);
+
+
 // 📌 Ajoute ceci pour lancer ton serveur
 app.listen(PORT, () => {
   console.log(`🚀 Serveur proxy en écoute sur http://localhost:${PORT}`);

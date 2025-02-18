@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 const BEARER_TOKEN = process.env.BEARER_TOKEN; // Remplace avec ton vrai token
 
 // ✅ Activer CORS pour toutes les requêtes

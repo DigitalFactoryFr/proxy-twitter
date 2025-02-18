@@ -1,54 +1,62 @@
+require("dotenv").config();
 const express = require("express");
 const fetch = require("node-fetch");
 const cors = require("cors");
 
-const app = express(); // 📌 C'est ici que l'application Express est initialisée
+const app = express();
 const PORT = process.env.PORT || 5000;
-const bearerToken = process.env.BEARER_TOKEN; // Assurez-vous que ce token est bien défini
+const BEARER_TOKEN = process.env.BEARER_TOKEN; // Remplace avec ton vrai token
 
-app.use(cors());
+// ✅ Activer CORS pour toutes les requêtes
+app.use(cors({ origin: "*" }));
+console.log("✅ CORS activé pour toutes les origines");
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://digitalfactory.store");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
 
 app.get("/twitter/:username", async (req, res) => {
   const username = req.params.username;
-  const url = `https://api.twitter.com/2/users/by/username/${username}`;
+  const url = `https://api.twitter.com/2/users/by/username/${username}?user.fields=public_metrics`;
 
   try {
-    console.log(`🔄 Requête API Twitter pour : ${username}`);
+
+console.log("🔑 Bearer Token utilisé :", process.env.BEARER_TOKEN);
 
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${bearerToken}`,
+        "Authorization": `Bearer ${BEARER_TOKEN}`,
         "Content-Type": "application/json"
       }
     });
 
     const data = await response.json();
-    console.log("📢 Réponse API Twitter :", JSON.stringify(data, null, 2));
-
-    if (data.errors) {
-      res.status(404).json({ error: "Utilisateur non trouvé", details: data.errors });
+    if (data.data) {
+      res.json({
+        id: data.data.id,
+        name: data.data.name,
+        username: data.data.username,
+        abonnés: data.data.public_metrics.followers_count,
+      });
     } else {
-      res.json(data);
+      res.status(404).json({ error: "Utilisateur non trouvé" });
     }
   } catch (error) {
     console.error("❌ Erreur API Twitter :", error);
-    res.status(500).json({ error: "Erreur serveur", details: error.message });
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
-const limitUrl = "https://api.twitter.com/2/tweets?ids=123"; // Un ID bidon
-const limitResponse = await fetch(limitUrl, {
-  method: "GET",
-  headers: { "Authorization": `Bearer ${bearerToken}` }
+// ✅ Lancer le serveur après avoir bien défini toutes les routes et middleware
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Serveur proxy en écoute sur PORT: ${PORT}`);
 });
-console.log("Headers API Twitter:", limitResponse.headers);
 
-
-// 📌 Ajoute ceci pour lancer ton serveur
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur proxy en écoute sur http://localhost:${PORT}`);
-});
 
 
 const GOOGLE_API_KEY = process.env.GOOGLE_TOKEN;;

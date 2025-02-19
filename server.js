@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const axios = require("axios");
 const fetch = require("node-fetch");
 const cors = require("cors");
 
@@ -9,6 +10,7 @@ const BEARER_TOKEN = process.env.BEARER_TOKEN;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const GOOGLE_SEARCH_API_KEY = process.env.GOOGLE_SEARCH_TOKEN;
 const GOOGLE_SEARCH_CX = process.env.GOOGLE_SEARCH_CX;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // ✅ Configuration CORS
 app.use(cors({ origin: "*" }));
@@ -25,6 +27,7 @@ console.log("🔑 GOOGLE_SEARCH_TOKEN:", GOOGLE_SEARCH_API_KEY ? "OK" : "NON DÉ
 console.log("🔍 GOOGLE_SEARCH_CX:", GOOGLE_SEARCH_CX ? "OK" : "NON DÉFINI");
 console.log("🐦 BEARER_TOKEN Twitter:", BEARER_TOKEN ? "OK" : "NON DÉFINI");
 console.log("🌍 GOOGLE_API_KEY:", GOOGLE_API_KEY ? "OK" : "NON DÉFINI");
+console.log("🤖 OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "OK" : "NON DÉFINI");
 
 // ✅ Route principale Twitter
 app.get("/twitter/:username", async (req, res) => {
@@ -175,7 +178,131 @@ app.get("/youtube-channel-info", async (req, res) => {
     }
 });
 
+
+// ✅ Route pour récupérer des informations sur l'entreprise avec Google Custom Search et OpenAI
+
+app.get("/api/company-info", async (req, res) => {
+    const siteInternet = req.query.siteInternet;
+    
+    if (!siteInternet) {
+        return res.status(400).json({ error: "Paramètre 'siteInternet' requis" });
+    }
+
+    try {
+        console.log(`🔍 Recherche d'informations sur : ${siteInternet}`);
+
+        // 1️⃣ 🔎 Requête Google Custom Search API
+        const query = `"${siteInternet}" entreprise OR société OR startup OR industrie OR KPIs OR employés OR effectif OR création`;
+        const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX}`;
+
+        let searchResults;
+        try {
+            const response = await axios.get(searchUrl);
+            searchResults = response.data.items || [];
+        } catch (googleError) {
+            console.error("❌ Erreur API Google :", googleError.message);
+            return res.status(500).json({ error: "Erreur lors de la requête Google." });
+        }
+
+        if (!searchResults.length) {
+            return res.status(404).json({ error: "Aucune donnée trouvée sur Google." });
+        }
+
+        // ✅ Limiter les résultats à 2 pour éviter un prompt trop long
+        searchResults = searchResults.slice(0, 2);
+
+        // ✅ Extraire uniquement les informations essentielles des résultats
+        const extractedResults = searchResults.map(result => ({
+            titre: result.title,
+            lien: result.link,
+            description: result.snippet // Récupère seulement la description courte
+        }));
+
+        // 2️⃣ 📩 Construire le prompt pour OpenAI GPT-4 avec une structure allégée
+        const prompt = `
+            Voici un résumé des résultats de recherche Google sur "${siteInternet}":
+            ${JSON.stringify(extractedResults, null, 2)}
+
+     
+            - Synthétiser les informations clés sous forme d'un résumé concis.
+
+            ❗ Attention : Retournez uniquement un JSON bien structuré sans texte supplémentaire :
+            {
+                               "effectif": "Valeur",
+                "année_création": "Valeur",
+           
+                "dernières_actualités": [
+                    {"titre": "...", "source": "..."},
+                    {"titre": "...", "source": "..."}
+                ],
+        
+            }
+        `;
+
+        // ✅ Vérifier la taille du prompt
+        console.log(`🔍 Taille du prompt envoyé à OpenAI : ${prompt.length} caractères`);
+
+        if (prompt.length > 8000) {
+            return res.status(400).json({ error: "Le prompt est toujours trop long. Nouvelle réduction nécessaire." });
+        }
+
+        // 3️⃣ ✅ Vérifier que la clé OpenAI est bien définie
+        if (!OPENAI_API_KEY) {
+            return res.status(500).json({ error: "Clé OpenAI manquante" });
+        }
+
+        // 4️⃣ 🚀 Appel à OpenAI GPT-4
+        try {
+            const apiUrl = "https://api.openai.com/v1/chat/completions";
+
+            const aiResponse = await axios.post(apiUrl, {
+                model: "gpt-4",
+                messages: [{ role: "user", content: prompt }],
+                max_tokens: 400 // 🔽 Réduction à 400 tokens pour éviter les dépassements
+            }, {
+                headers: {
+                    "Authorization": `Bearer ${OPENAI_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                timeout: 20000 // ⏳ Timeout de 20 secondes
+            });
+
+            // ✅ Vérifier si la réponse contient bien un résultat
+            if (!aiResponse.data.choices || aiResponse.data.choices.length === 0) {
+                return res.status(500).json({ error: "Réponse vide de OpenAI" });
+            }
+
+            let responseText = aiResponse.data.choices[0].message.content.trim();
+
+try {
+    const finalData = JSON.parse(responseText);
+    console.log("✅ Résumé généré par OpenAI :", finalData);
+    res.json(finalData);
+} catch (jsonError) {
+    console.error("❌ Erreur JSON OpenAI :", responseText);
+    res.status(500).json({ error: "OpenAI a renvoyé un format non valide. Voici la réponse brute :", raw: responseText });
+}
+
+
+            console.log("✅ Résumé généré par OpenAI :", finalData);
+
+            // 5️⃣ 📤 Retourner les informations interprétées
+            res.json(finalData);
+
+        } catch (openAiError) {
+            console.error("❌ Erreur API OpenAI :", openAiError.response ? openAiError.response.data : openAiError.message);
+            res.status(500).json({ error: "Erreur lors de la requête OpenAI" });
+        }
+
+    } catch (error) {
+        console.error("❌ Erreur inattendue :", error);
+        res.status(500).json({ error: "Erreur interne du serveur." });
+    }
+});
+
+
+
 // ✅ Lancer le serveur
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Serveur en écoute sur http://localhost:${PORT}`);
+    console.log(`🚀 Serveur en écoute sur http://localhost:${PORT}`);
 });

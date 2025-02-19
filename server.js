@@ -98,82 +98,81 @@ app.get("/api/get-reviews", async (req, res) => {
   }
 });
 
-// ✅ Route de recherche YouTube via Google Search API
-// ✅ Route pour **chercher une chaîne YouTube** associée à un site web
-app.get("/find-youtube-channel", async (req, res) => {
-    const siteInternet = req.query.siteInternet;
-    if (!siteInternet) {
-        return res.status(400).json({ error: "URL du site requise" });
+// ✅ Route pour récupérer les statistiques complètes de la chaîne YouTube
+app.get("/youtube-channel-info", async (req, res) => {
+    const channelHandle = req.query.channelHandle; // Ex: "@DigitalFactory"
+    if (!channelHandle) {
+        return res.status(400).json({ error: "Handle de chaîne requis (ex: @DigitalFactory)" });
     }
 
     try {
-        console.log(`🔎 Recherche d'une chaîne YouTube pour : ${siteInternet}`);
+        console.log(`🔍 Recherche des infos pour la chaîne YouTube : ${channelHandle}`);
 
-        // 🔍 Recherche Google ciblée sur YouTube
-        const searchQuery = `site:youtube.com ${siteInternet}`;
-        const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(searchQuery)}&cx=${GOOGLE_SEARCH_CX}&key=${GOOGLE_SEARCH_API_KEY}`;
+        // 1️⃣ Récupérer l'ID de la chaîne via le handle YouTube
+        const handleUrl = `https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${channelHandle}&key=${GOOGLE_API_KEY}`;
+        const handleResponse = await fetch(handleUrl);
+        const handleData = await handleResponse.json();
 
-        const response = await fetch(searchUrl);
-        const data = await response.json();
-
-        if (!data.items || data.items.length === 0) {
-            return res.status(404).json({ error: "Aucune chaîne YouTube trouvée pour ce site." });
+        if (!handleData.items || handleData.items.length === 0) {
+            return res.status(404).json({ error: "Aucune chaîne trouvée pour ce handle." });
         }
 
-        // 📌 Extraire l'URL de la chaîne YouTube
-        const firstResult = data.items[0];
+        const channelId = handleData.items[0].id;
+        console.log(`✅ ID de la chaîne trouvé : ${channelId}`);
 
-        let channelId = null;
-        if (firstResult.link.includes("youtube.com/channel/")) {
-            channelId = firstResult.link.split("/channel/")[1];
-        } else if (firstResult.link.includes("youtube.com/c/")) {
-            channelId = firstResult.link.split("/c/")[1];
-        } else if (firstResult.link.includes("youtube.com/user/")) {
-            channelId = firstResult.link.split("/user/")[1];
+        // 2️⃣ Récupérer les statistiques de la chaîne (abonnés, vues, vidéos)
+        const statsUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${GOOGLE_API_KEY}`;
+        const statsResponse = await fetch(statsUrl);
+        const statsData = await statsResponse.json();
+
+        if (!statsData.items || statsData.items.length === 0) {
+            return res.status(404).json({ error: "Impossible de récupérer les stats de la chaîne." });
         }
 
-        if (!channelId) {
-            return res.status(404).json({ error: "Impossible d'extraire l'ID de la chaîne." });
+        const stats = statsData.items[0].statistics;
+        const subscribers = stats.subscriberCount;
+        const totalViews = stats.viewCount;
+        const totalVideos = stats.videoCount;
+
+        // 3️⃣ Récupérer la dernière vidéo publiée
+        const latestVideoUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&order=date&type=video&key=${GOOGLE_API_KEY}`;
+        const latestVideoResponse = await fetch(latestVideoUrl);
+        const latestVideoData = await latestVideoResponse.json();
+
+        let latestVideo = null;
+        if (latestVideoData.items && latestVideoData.items.length > 0) {
+            latestVideo = {
+                videoId: latestVideoData.items[0].id.videoId,
+                title: latestVideoData.items[0].snippet.title,
+                thumbnail: latestVideoData.items[0].snippet.thumbnails.medium.url,
+                url: `https://www.youtube.com/watch?v=${latestVideoData.items[0].id.videoId}`
+            };
         }
 
-        console.log(`✅ Chaîne YouTube trouvée : ${firstResult.title} (ID: ${channelId})`);
+        // 4️⃣ Récupérer la vidéo la plus populaire
+        const popularVideoUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&order=viewCount&type=video&key=${GOOGLE_API_KEY}`;
+        const popularVideoResponse = await fetch(popularVideoUrl);
+        const popularVideoData = await popularVideoResponse.json();
 
+        let popularVideo = null;
+        if (popularVideoData.items && popularVideoData.items.length > 0) {
+            popularVideo = {
+                videoId: popularVideoData.items[0].id.videoId,
+                title: popularVideoData.items[0].snippet.title,
+                thumbnail: popularVideoData.items[0].snippet.thumbnails.medium.url,
+                url: `https://www.youtube.com/watch?v=${popularVideoData.items[0].id.videoId}`
+            };
+        }
+
+        // ✅ Retourner toutes les informations en JSON
         res.json({
-            channelTitle: firstResult.title,
-            channelId: channelId,
-            channelUrl: firstResult.link
+            channelId,
+            subscribers,
+            totalViews,
+            totalVideos,
+            latestVideo,
+            popularVideo
         });
-
-    } catch (error) {
-        console.error("❌ Erreur API Google Search :", error);
-        res.status(500).json({ error: "Erreur serveur lors de la recherche YouTube." });
-    }
-});
-
-// ✅ Route pour récupérer **le nombre d'abonnés YouTube**
-app.get("/youtube-subscribers", async (req, res) => {
-    const channelId = req.query.channelId;
-    if (!channelId) {
-        return res.status(400).json({ error: "ID de chaîne requis" });
-    }
-
-    try {
-        console.log(`🔍 Recherche des abonnés pour la chaîne ID: ${channelId}`);
-
-        const youtubeUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${GOOGLE_API_KEY}`;
-        console.log(`📡 URL API YouTube: ${youtubeUrl}`);
-
-        const response = await fetch(youtubeUrl);
-        const data = await response.json();
-
-        console.log("📡 Réponse brute API YouTube:", JSON.stringify(data, null, 2));
-
-        if (!data.items || data.items.length === 0) {
-            return res.status(404).json({ error: "Chaîne YouTube introuvable." });
-        }
-
-        const subscribers = data.items[0].statistics.subscriberCount;
-        res.json({ channelId, subscribers });
 
     } catch (error) {
         console.error("❌ Erreur API YouTube :", error);

@@ -179,20 +179,25 @@ app.get("/youtube-channel-info", async (req, res) => {
 });
 
 
-// ✅ Route pour récupérer des informations sur l'entreprise avec Google Custom Search et OpenAI
 
+// ✅ Route pour récupérer les actualités sur une entreprise
 app.get("/api/company-info", async (req, res) => {
-    const siteInternet = req.query.siteInternet;
+    const companyName = req.query.companyName;
+    const companyWebsite = req.query.companyWebsite;
     
-    if (!siteInternet) {
-        return res.status(400).json({ error: "Paramètre 'siteInternet' requis" });
+    if (!companyName && !companyWebsite) {
+        return res.status(400).json({ error: "Paramètres 'companyName' ou 'companyWebsite' requis" });
     }
 
     try {
-        console.log(`🔍 Recherche d'informations sur : ${siteInternet}`);
+        console.log(`🔍 Recherche d'informations sur : ${companyName} | Site : ${companyWebsite}`);
 
-        // 1️⃣ 🔎 Requête Google Custom Search API
-        const query = `"${siteInternet}" entreprise OR société OR startup OR industrie OR KPIs OR employés OR effectif OR création`;
+        // ✅ Construire la requête Google Custom Search avec le nom et le site web
+        let query = "(";
+        if (companyName) query += `"${companyName}" OR `;
+        if (companyWebsite) query += `site:${companyWebsite}`;
+        query += ") (actualités OR news OR article OR innovation OR expansion OR financement OR recrutement) after:2024-01-01";
+
         const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX}`;
 
         let searchResults;
@@ -208,42 +213,43 @@ app.get("/api/company-info", async (req, res) => {
             return res.status(404).json({ error: "Aucune donnée trouvée sur Google." });
         }
 
-        // ✅ Limiter les résultats à 2 pour éviter un prompt trop long
-        searchResults = searchResults.slice(0, 2);
+        // ✅ Limiter les résultats à 3 articles pour éviter un prompt trop long
+        searchResults = searchResults.slice(0, 3);
 
         // ✅ Extraire uniquement les informations essentielles des résultats
         const extractedResults = searchResults.map(result => ({
             titre: result.title,
-            lien: result.link,
+            source: result.link,
             description: result.snippet // Récupère seulement la description courte
         }));
 
-        // 2️⃣ 📩 Construire le prompt pour OpenAI GPT-4 avec une structure allégée
-        const prompt = `
-            Voici un résumé des résultats de recherche Google sur "${siteInternet}":
-            ${JSON.stringify(extractedResults, null, 2)}
+const prompt = `
+    Voici un résumé des résultats de recherche Google sur "${companyName || companyWebsite}":
+    ${JSON.stringify(extractedResults, null, 2)}
 
-     
-            - Synthétiser les informations clés sous forme d'un résumé concis.
+    - Pour chaque actualité, reformuler une description **courte et claire** en **une seule phrase**.
+    - Ne pas reprendre le titre original, mais résumer **le contenu de l'article**.
+    - Écrire chaque description **dans la même langue que l'article source**.
+    - Si l'article est en français, écrire la description en français.
+    - Si l'article est en anglais, écrire la description en anglais.
+    - Si la langue de l'article est inconnue, écrire en anglais par défaut.
 
-            ❗ Attention : Retournez uniquement un JSON bien structuré sans texte supplémentaire :
-            {
-                               "effectif": "Valeur",
-                "année_création": "Valeur",
-           
-                "dernières_actualités": [
-                    {"titre": "...", "source": "..."},
-                    {"titre": "...", "source": "..."}
-                ],
-        
-            }
-        `;
+    ❗ Attention : Retournez uniquement un JSON bien structuré sans texte supplémentaire :
+    {
+        "dernières_actualités": [
+            {"description": "Une phrase résumant l'actualité dans la langue de l'article", "source": "URL de l'article"},
+            {"description": "Une phrase résumant l'actualité dans la langue de l'article", "source": "URL de l'article"}
+        ]
+    }
+`;
 
-        // ✅ Vérifier la taille du prompt
-        console.log(`🔍 Taille du prompt envoyé à OpenAI : ${prompt.length} caractères`);
+
+
+        // ✅ Vérifier la taille du prompt avant d'envoyer à OpenAI
+        console.log(`🔍 Taille du prompt OpenAI : ${prompt.length} caractères`);
 
         if (prompt.length > 8000) {
-            return res.status(400).json({ error: "Le prompt est toujours trop long. Nouvelle réduction nécessaire." });
+            return res.status(400).json({ error: "Le prompt est trop long. Nouvelle réduction nécessaire." });
         }
 
         // 3️⃣ ✅ Vérifier que la clé OpenAI est bien définie
@@ -253,54 +259,46 @@ app.get("/api/company-info", async (req, res) => {
 
         // 4️⃣ 🚀 Appel à OpenAI GPT-4
         try {
-            const apiUrl = "https://api.openai.com/v1/chat/completions";
-
-            const aiResponse = await axios.post(apiUrl, {
-                model: "gpt-4",
-                messages: [{ role: "user", content: prompt }],
-                max_tokens: 400 // 🔽 Réduction à 400 tokens pour éviter les dépassements
-            }, {
-                headers: {
-                    "Authorization": `Bearer ${OPENAI_API_KEY}`,
-                    "Content-Type": "application/json"
+            const aiResponse = await axios.post(
+                "https://api.openai.com/v1/chat/completions",
+                {
+                    model: "gpt-4",
+                    messages: [{ role: "user", content: prompt }],
+                    max_tokens: 400
                 },
-                timeout: 20000 // ⏳ Timeout de 20 secondes
-            });
+                {
+                    headers: {
+                        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+                        "Content-Type": "application/json"
+                    },
+                    timeout: 20000 // ⏳ Timeout de 20 secondes
+                }
+            );
 
-            // ✅ Vérifier si la réponse contient bien un résultat
+            // ✅ Vérifier si OpenAI a bien généré une réponse
             if (!aiResponse.data.choices || aiResponse.data.choices.length === 0) {
                 return res.status(500).json({ error: "Réponse vide de OpenAI" });
             }
 
             let responseText = aiResponse.data.choices[0].message.content.trim();
 
-try {
-    const finalData = JSON.parse(responseText);
-    console.log("✅ Résumé généré par OpenAI :", finalData);
-    res.json(finalData);
-} catch (jsonError) {
-    console.error("❌ Erreur JSON OpenAI :", responseText);
-    res.status(500).json({ error: "OpenAI a renvoyé un format non valide. Voici la réponse brute :", raw: responseText });
-}
-
-
-            console.log("✅ Résumé généré par OpenAI :", finalData);
-
-            // 5️⃣ 📤 Retourner les informations interprétées
-            res.json(finalData);
-
+            try {
+                const finalData = JSON.parse(responseText);
+                console.log("✅ Résumé généré par OpenAI :", finalData);
+                res.json(finalData);
+            } catch (jsonError) {
+                console.error("❌ Erreur JSON OpenAI :", responseText);
+                res.status(500).json({ error: "Format de réponse OpenAI non valide.", raw: responseText });
+            }
         } catch (openAiError) {
             console.error("❌ Erreur API OpenAI :", openAiError.response ? openAiError.response.data : openAiError.message);
             res.status(500).json({ error: "Erreur lors de la requête OpenAI" });
         }
-
     } catch (error) {
         console.error("❌ Erreur inattendue :", error);
         res.status(500).json({ error: "Erreur interne du serveur." });
     }
 });
-
-
 
 // ✅ Lancer le serveur
 app.listen(PORT, "0.0.0.0", () => {

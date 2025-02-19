@@ -27,14 +27,14 @@ console.log("🐦 BEARER_TOKEN Twitter:", BEARER_TOKEN ? "OK" : "NON DÉFINI");
 console.log("🌍 GOOGLE_API_KEY:", GOOGLE_API_KEY ? "OK" : "NON DÉFINI");
 
 // ✅ Route principale Twitter
-app.get("/twitter-from-website", async (req, res) => {
-  const siteInternet = req.query.siteInternet;
-  if (!siteInternet) return res.status(400).json({ error: "URL du site requise" });
+app.get("/twitter/:username", async (req, res) => {
+  const username = req.params.username;
+  const url = `https://api.twitter.com/2/users/by/username/${username}?user.fields=public_metrics`;
 
   try {
-    console.log(`🔎 Recherche d'un compte Twitter lié au site : ${siteInternet}`);
 
-    const url = `https://api.twitter.com/2/users/by?user.fields=public_metrics,entities`;
+console.log("🔑 Bearer Token utilisé :", process.env.BEARER_TOKEN);
+
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -44,27 +44,22 @@ app.get("/twitter-from-website", async (req, res) => {
     });
 
     const data = await response.json();
-    if (!data || !data.data) return res.status(404).json({ error: "Aucun compte Twitter trouvé." });
-
-    const matchingAccount = data.data.find(user =>
-      user.entities?.url?.urls?.some(u => u.expanded_url.includes(siteInternet))
-    );
-
-    if (!matchingAccount) return res.status(404).json({ error: "Aucun compte Twitter trouvé." });
-
-    console.log(`✅ Compte Twitter trouvé : @${matchingAccount.username}`);
-
-    res.json({
-      username: matchingAccount.username,
-      abonnés: matchingAccount.public_metrics.followers_count,
-      nom: matchingAccount.name
-    });
-
+    if (data.data) {
+      res.json({
+        id: data.data.id,
+        name: data.data.name,
+        username: data.data.username,
+        abonnés: data.data.public_metrics.followers_count,
+      });
+    } else {
+      res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
   } catch (error) {
     console.error("❌ Erreur API Twitter :", error);
-    res.status(500).json({ error: "Erreur serveur Twitter." });
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
 
 // ✅ Route pour récupérer le Place ID Google
 app.get("/api/get-place-id", async (req, res) => {

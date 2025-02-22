@@ -194,7 +194,7 @@ app.get("/api/company-info", async (req, res) => {
 
         // ✅ Construire la requête Google Custom Search avec le nom et le site web
         let query = "(";
-        if (companyName) query += `"${companyName}" OR `;
+   
         if (companyWebsite) query += `site:${companyWebsite}`;
         query += ") (actualités OR news OR article OR innovation OR expansion OR financement OR recrutement) after:2024-01-01";
 

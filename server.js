@@ -242,7 +242,6 @@ const prompt = `
     - Si l'article est en anglais, écrire la description en anglais.
     - Si la langue de l'article est inconnue, écrire en anglais par défaut.
     - Récupérer l'image et la date de publication si disponibles.
-    - Écrire chaque description **dans la langue de l'article**.
 
     ❗ Attention : Retournez uniquement un JSON bien structuré sans texte supplémentaire :
     {

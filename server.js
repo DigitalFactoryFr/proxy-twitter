@@ -187,36 +187,60 @@ app.get("/youtube-channel-info", async (req, res) => {
  // ✅ Faire de recherche d'actualités avec Perplexity AI
 
 
-async function getLatestNews(companyName) {
-    if (!PERPLEXITY_API_KEY) {
-        return { error: "Clé API Perplexity non définie." };
-    }
 
+// ✅ Fonction pour récupérer les dernières actualités avec `companyWebsite`
+async function getLatestNews(companyWebsite) {
     try {
-        console.log(`🔍 Recherche des dernières actualités pour : ${companyName}`);
+        console.log(`🔍 Recherche des dernières actualités pour : ${companyWebsite}`);
 
         const response = await axios.post(
             "https://api.perplexity.ai/chat/completions",
             {
                 model: "sonar-pro",
                 messages: [
-                    { role: "system", content: "Be precise and concise." },
+                    { role: "system", content: "Provide structured, concise, and complete responses with valid JSON format." },
                     { 
                         role: "user", 
-                        content: `Provide the latest news about ${companyName}. 
-                                  Return a structured JSON with:
-                                  - 'description' (concise summary)
-                                  - 'source' (news link)
-                                  - 'image' (article image URL if available)
-                                  - 'date' (publication date YYYY-MM-DD if available).
-                                  Return JSON format only.` 
+                        content: `
+                            Find the latest news about ${companyWebsite}.
+                            Extract structured information from recent articles, blogs, or press releases.
+
+                            **Ensure each news item includes**:
+                            - "title": The headline of the article.
+                            - "description": A **short** summary.
+                            - "source": The article's URL.
+                            - "image": An image URL related to the article.
+                            - "date": The publication date (YYYY-MM-DD).
+
+
+                            **Return this JSON format only**:
+                            {
+                                "dernières_actualités": [
+                                    {
+                                        "title": "...",
+                                        "description": "...",
+                                        "source": "...",
+                                        "image": "...",
+                                        "date": "..."
+                                    },
+                                    {
+                                        "title": "...",
+                                        "description": "...",
+                                        "source": "...",
+                                        "image": "...",
+                                        "date": "..."
+                                    }
+                                ]
+                            }
+                        `
                     }
                 ]
             },
             {
                 headers: {
                     "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
                 }
             }
         );
@@ -225,8 +249,8 @@ async function getLatestNews(companyName) {
             return { error: "Réponse invalide de Perplexity AI" };
         }
 
+        // 🔥 Vérification et parsing de la réponse
         const parsedResponse = response.data.choices[0].message.content;
-        
         try {
             const newsData = JSON.parse(parsedResponse);
             return newsData;
@@ -241,19 +265,19 @@ async function getLatestNews(companyName) {
     }
 }
 
-// 🚀 Route pour récupérer les actualités d'une entreprise
+// 🚀 Route API pour récupérer les actualités d'une entreprise avec `companyWebsite`
 app.get("/api/company-info", async (req, res) => {
-    const companyName = req.query.companyName;
+    const companyWebsite = req.query.companyWebsite;
 
-    if (!companyName) {
-        return res.status(400).json({ error: "Paramètre 'companyName' requis" });
+    if (!companyWebsite) {
+        return res.status(400).json({ error: "Paramètre 'companyWebsite' requis" });
     }
 
-    const news = await getLatestNews(companyName);
+    const news = await getLatestNews(companyWebsite);
     res.json(news);
 });
 
-// Lancer le serveur
+// ✅ Lancer le serveur Express
 app.listen(PORT, () => {
     console.log(`🚀 Serveur en écoute sur http://localhost:${PORT}`);
 });

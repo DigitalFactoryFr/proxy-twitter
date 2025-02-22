@@ -217,17 +217,19 @@ app.get("/api/company-info", async (req, res) => {
         searchResults = searchResults.slice(0, 3);
 
         // ✅ Extraire uniquement les informations essentielles des résultats
-	const extractedResults = searchResults.map(result => {
-   	 let imageUrl = result.pagemap?.cse_image?.[0]?.src || null; // 🖼️ Image de l'article si disponible
-    	let publishedDate = result.pagemap?.metatags?.[0]?.['article:published_time'] || null; // 📅 Date de publication si disponible
-            titre: result.title,
-            source: result.link,
-            description: result.snippet // Récupère seulement la description courte
- 	image: imageUrl, // 🖼️ Image associée
-        date: publishedDate // 📅 Date de publication si dispo
+const extractedResults = searchResults.map(result => {
+    let imageUrl = result.pagemap?.cse_image?.[0]?.src || result.pagemap?.cse_thumbnail?.[0]?.src || null; // 🖼️ Prend l'image ou une miniature
+    let publishedDate = result.pagemap?.metatags?.[0]?.['article:published_time'] || result.snippet.match(/\d{4}-\d{2}-\d{2}/)?.[0] || null; // 📅 Date si dispo
 
+    return {
+        titre: result.title,
+        source: result.link,
+        description: result.snippet,
+        image: imageUrl,
+        date: publishedDate
+    };
+});
 
-        }));
 
 const prompt = `
     Voici un résumé des résultats de recherche Google sur "${companyName || companyWebsite}":

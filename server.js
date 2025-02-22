@@ -211,12 +211,12 @@ async function getLatestNews(companyWebsite) {
             {
               "dernières_actualités": [
                 {
-                  "title": "...",
-                  "description": "...",
+                  "title": "...", The headline (max **100** characters).
+                  "description": "...",  A **short** summary (max **150** characters).
                   "source": "...",  Name of the source (e.g., "BBC News")
                   "url": "...", The **direct** link to the news article (**fully valid and untruncated**
                   "date": "...",  Format: YYYY-MM-DD
-                  "tags": ["..."],Relevant tags like "Funding", "Acquisition", "New Product"
+                  "tags": ["..."], Up to Relevant tags like "Funding", "Acquisition", "New Product"
                 }
               ]
             }

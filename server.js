@@ -4,6 +4,7 @@ const axios = require("axios");
 const fetch = require("node-fetch");
 const cors = require("cors");
 const cheerio = require('cheerio');
+const fs = require("fs");
 
 
 const app = express();
@@ -267,7 +268,42 @@ app.get("/api/company-info", async (req, res) => {
     res.json(news);
 });
 
+
+
+
+
+// ✅ Gestion des Feedbacks (Like / Dislike) avec persistance
+const feedbackFile = "feedback.json";
+
+// 📌 Charger les votes sauvegardés
+let feedback = { likes: 0, dislikes: 0 };
+if (fs.existsSync(feedbackFile)) {
+    try {
+        feedback = JSON.parse(fs.readFileSync(feedbackFile, "utf-8"));
+    } catch (err) {
+        console.error("❌ Erreur lors du chargement des votes :", err);
+    }
+}
+
+// ✅ Récupérer les votes
+app.get("/api/feedback", (req, res) => {
+    res.json(feedback);
+});
+
+// ✅ Mettre à jour les votes
+app.post("/api/feedback", (req, res) => {
+    const { type } = req.body;
+    if (type === "like") feedback.likes++;
+    if (type === "dislike") feedback.dislikes++;
+
+    // ✅ Sauvegarde sur disque
+    fs.writeFileSync(feedbackFile, JSON.stringify(feedback, null, 2));
+
+    res.json(feedback);
+});
+
 // ✅ Lancer le serveur Express
 app.listen(PORT, () => {
     console.log(`🚀 Serveur en écoute sur http://localhost:${PORT}`);
 });
+

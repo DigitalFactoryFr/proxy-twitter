@@ -199,54 +199,22 @@ async function getLatestNews(companyWebsite) {
 
         const response = await axios.post(
             "https://api.perplexity.ai/chat/completions",
+    {
+        model: "sonar-pro",
+        max_tokens: 500,  // ✅ Limite la réponse à 500 tokens (ajuste si nécessaire)
+        messages: [
+            { role: "system", content: "Provide structured, concise responses." },
+            { role: "user", content: `Find recent news about ${companyWebsite} from blogs, press releases, or news sources.
+
+            Return only JSON:
             {
-                model: "sonar-pro",
-                messages: [
-                    { role: "system", content: "Provide structured, concise, and complete responses with valid JSON format." },
-                    { 
-                        role: "user", 
-                        content: `
-  Find the latest news about ${companyWebsite}.
-        Extract structured information from recent articles, blogs, or press releases.
-
-        **Ensure each news item includes**:
-        - "title": The headline of the article.
-        - "description": A **short** summary.
-        - "source": The article's URL.
-        - "image": The **first real image URL found in the article** (no placeholders like example.com).
-        - "date": The publication date (YYYY-MM-DD).
-        - "tags": One or multiple relevant tags from this list: ["Acquisition", "Partnership", "Funding", "Investment", "New Product", "New Client", "Market Expansion", "Regulation Update", "Innovation", "Hiring", "IPO"].
-
-        **IMPORTANT**:
-        - **The "image" field must be a valid direct URL from the article.**
-        - If no image is found, return **the most relevant industry-related stock photo**.
-        - Do NOT return "null" or example.com images.
-
-                            **Return ONLY this JSON format**:
-                            {
-                                "dernières_actualités": [
-                                    {
-                                        "title": "...",
-                                        "description": "...",
-                                        "source": "...",
-                                        "image": "...",
-                                        "date": "...",
-                                        "tags": ["..."]
-                                    },
-                                    {
-                                        "title": "...",
-                                        "description": "...",
-                                        "source": "...",
-                                        "image": "...",
-                                        "date": "...",
-                                        "tags": ["..."]
-                                    }
-                                ]
-                            }
-                        `
-                    }
-                ]
-            },
+              "dernières_actualités": [
+                {"title": "...", "description": "...", "source": "...", "date": "...", "tags": ["..."]}
+              ]
+            }
+            - Limit response to 3 items.` }
+        ]
+    },
             {
                 headers: {
                     "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,

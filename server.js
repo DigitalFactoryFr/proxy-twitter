@@ -182,46 +182,50 @@ app.get("/youtube-channel-info", async (req, res) => {
 
 
 
-// ✅ Route pour récupérer les actualités sur une entreprise
-app.get("/api/company-info", async (req, res) => {
-    const companyName = req.query.companyName;
-    const companyWebsite = req.query.companyWebsite;
-    
-    if (!companyName && !companyWebsite) {
-        return res.status(400).json({ error: "Paramètres 'companyName' ou 'companyWebsite' requis" });
-    }
 
-
+// ✅ Fonction pour extraire l'activité d'une entreprise depuis son site web
 async function getCompanyActivity(companyWebsite) {
+    if (!companyWebsite) return "technologie"; // Fallback si l'URL est vide
+
     try {
         const response = await axios.get(companyWebsite);
         const $ = cheerio.load(response.data);
 
         // Recherche dans les balises les plus courantes où l'activité est mentionnée
-        let activity = $('meta[name="description"]').attr('content') || // Meta Description
-                       $('title').text() || // Titre de la page
-                       $('h1').first().text() || // Premier H1
-                       $('h2').first().text(); // Premier H2
+        let activity = $('meta[name="description"]').attr("content") || 
+                       $("title").text() || 
+                       $("h1").first().text() || 
+                       $("h2").first().text();
 
         return activity || "technologie"; // Retourne une valeur par défaut si rien n'est trouvé
     } catch (error) {
-        console.error("Erreur lors de la récupération de l'activité :", error);
-        return "technologie"; // Fallback en cas d'erreur
+        console.error("❌ Erreur lors de la récupération de l'activité :", error.message);
+        return "technologie"; // Retourne un fallback en cas d'erreur
     }
 }
-   
 
- try {
+// ✅ Route pour récupérer les actualités sur une entreprise
+app.get("/api/company-info", async (req, res) => {
+    const companyName = req.query.companyName;
+    const companyWebsite = req.query.companyWebsite;
+
+    if (!companyName && !companyWebsite) {
+        return res.status(400).json({ error: "Paramètres 'companyName' ou 'companyWebsite' requis" });
+    }
+
+    try {
         console.log(`🔍 Recherche d'informations sur : ${companyName} | Site : ${companyWebsite}`);
 
-        // ✅ Construire la requête Google Custom Search avec le nom et le site web
-     
-   
-	const companyActivity = await getCompanyActivity(companyWebsite);
+        // ✅ Obtenir l'activité de l'entreprise
+        let companyActivity = "technologie"; // Valeur par défaut
+        try {
+            companyActivity = await getCompanyActivity(companyWebsite);
+        } catch (error) {
+            console.error("❌ Impossible de récupérer l'activité, utilisation de la valeur par défaut.");
+        }
 
-	let query = `"${companyName}" OR site:${companyWebsite} ("${companyActivity}" OR "services" OR "produits") (actualités OR news OR article OR innovation OR financement) 	after:2024-01-01`;
-
-
+        // ✅ Construire la requête Google Custom Search
+        let query = `"${companyName}" OR site:${encodeURIComponent(companyWebsite)} ("${companyActivity}" OR "services" OR "produits") (actualités OR news OR article OR innovation OR financement) after:2024-01-01`;
 
         const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX}`;
 
@@ -242,40 +246,37 @@ async function getCompanyActivity(companyWebsite) {
         searchResults = searchResults.slice(0, 3);
 
         // ✅ Extraire uniquement les informations essentielles des résultats
-const extractedResults = searchResults.map(result => {
-    let imageUrl = result.pagemap?.cse_image?.[0]?.src || result.pagemap?.cse_thumbnail?.[0]?.src || null; // 🖼️ Prend l'image ou une miniature
-    let publishedDate = result.pagemap?.metatags?.[0]?.['article:published_time'] || result.snippet.match(/\d{4}-\d{2}-\d{2}/)?.[0] || null; // 📅 Date si dispo
+        const extractedResults = searchResults.map(result => {
+            let imageUrl = result.pagemap?.cse_image?.[0]?.src || result.pagemap?.cse_thumbnail?.[0]?.src || null;
+            let publishedDate = result.pagemap?.metatags?.[0]?.["article:published_time"] || result.snippet.match(/\d{4}-\d{2}-\d{2}/)?.[0] || null;
 
-    return {
-        titre: result.title,
-        source: result.link,
-        description: result.snippet,
-        image: imageUrl,
-        date: publishedDate
-    };
-});
+            return {
+                titre: result.title,
+                source: result.link,
+                description: result.snippet,
+                image: imageUrl,
+                date: publishedDate
+            };
+        });
 
+        // ✅ Construire le prompt pour OpenAI
+        const prompt = ` 
+            Voici un résumé des résultats de recherche Google sur "${companyName || companyWebsite}":
+            ${JSON.stringify(extractedResults, null, 2)}
 
-const prompt = ` 
-    Voici un résumé des résultats de recherche Google sur "${companyName || companyWebsite}":
-    ${JSON.stringify(extractedResults, null, 2)}
+            - Vérifie que chaque article parle bien de **${companyName}** et de son activité **(${companyActivity})**.
+            - Si un article ne parle pas de **${companyActivity}**, **ne l'inclus pas** dans la réponse.
+            - Priorise les articles sur les **produits, services, innovations ou investissements** de l’entreprise.
+            - Reformule chaque actualité en **une seule phrase courte et claire**.
+            - Écrire chaque description **dans la même langue que l'article source**.
 
-    - Vérifie que chaque article parle bien de **${companyName}** et de son activité **(${companyActivity})**.
-    - Si un article ne parle pas de **${companyActivity}**, **ne l'inclus pas** dans la réponse.
-    - Priorise les articles sur les **produits, services, innovations ou investissements** de l’entreprise.
-    - Reformule chaque actualité en **une seule phrase courte et claire**.
-    - Écrire chaque description **dans la même langue que l'article source**.
-
-    ❗ Retourne uniquement un JSON bien structuré :
-    {
-     "dernières_actualités": [
-            {"description": "Résumé pertinent", "source": "URL", "image": "URL", "date": "AAAA-MM-JJ"}
-        ]
-    }
-`;
-
-
-
+            ❗ Retourne uniquement un JSON bien structuré :
+            {
+            "dernières_actualités": [
+                    {"description": "Résumé pertinent", "source": "URL", "image": "URL", "date": "AAAA-MM-JJ"}
+                ]
+            }
+        `;
 
         // ✅ Vérifier la taille du prompt avant d'envoyer à OpenAI
         console.log(`🔍 Taille du prompt OpenAI : ${prompt.length} caractères`);
@@ -284,12 +285,12 @@ const prompt = `
             return res.status(400).json({ error: "Le prompt est trop long. Nouvelle réduction nécessaire." });
         }
 
-        // 3️⃣ ✅ Vérifier que la clé OpenAI est bien définie
+        // ✅ Vérifier que la clé OpenAI est bien définie
         if (!OPENAI_API_KEY) {
             return res.status(500).json({ error: "Clé OpenAI manquante" });
         }
 
-        // 4️⃣ 🚀 Appel à OpenAI GPT-4
+        // ✅ Appel à OpenAI GPT-4
         try {
             const aiResponse = await axios.post(
                 "https://api.openai.com/v1/chat/completions",
@@ -307,7 +308,6 @@ const prompt = `
                 }
             );
 
-            // ✅ Vérifier si OpenAI a bien généré une réponse
             if (!aiResponse.data.choices || aiResponse.data.choices.length === 0) {
                 return res.status(500).json({ error: "Réponse vide de OpenAI" });
             }
@@ -333,6 +333,6 @@ const prompt = `
 });
 
 // ✅ Lancer le serveur
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
     console.log(`🚀 Serveur en écoute sur http://localhost:${PORT}`);
 });

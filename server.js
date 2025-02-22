@@ -182,7 +182,7 @@ app.get("/youtube-channel-info", async (req, res) => {
 
 
 
-
+// ✅ Route pour récupérer les actualités sur une entreprise
 // ✅ Fonction pour extraire l'activité d'une entreprise depuis son site web
 async function getCompanyActivity(companyWebsite) {
     if (!companyWebsite) return "technologie"; // Fallback si l'URL est vide
@@ -225,7 +225,8 @@ app.get("/api/company-info", async (req, res) => {
         }
 
         // ✅ Construire la requête Google Custom Search
-        let query = `"${companyName}" OR site:${encodeURIComponent(companyWebsite)} ("${companyActivity}" OR "services" OR "produits") (actualités OR news OR article OR innovation OR financement) after:2024-01-01`;
+let query = `intitle:"${companyName}" intext:"${companyName}" ("${companyActivity}" OR "produits" OR "services") site:${encodeURIComponent(companyWebsite)} after:2024-01-01`;
+
 
         const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX}`;
 

@@ -190,6 +190,10 @@ app.get("/youtube-channel-info", async (req, res) => {
 
 // ✅ Fonction pour récupérer les dernières actualités avec `companyWebsite`
 async function getLatestNews(companyWebsite) {
+    if (!PERPLEXITY_API_KEY) {
+        return { error: "Clé API Perplexity non définie." };
+    }
+
     try {
         console.log(`🔍 Recherche des dernières actualités pour : ${companyWebsite}`);
 
@@ -202,18 +206,23 @@ async function getLatestNews(companyWebsite) {
                     { 
                         role: "user", 
                         content: `
-                            Find the latest news about ${companyWebsite}.
-                            Extract structured information from recent articles, blogs, or press releases.
+  Find the latest news about ${companyWebsite}.
+        Extract structured information from recent articles, blogs, or press releases.
 
-                            **Ensure each news item includes**:
-                            - "title": The headline of the article.
-                            - "description": A **short** summary.
-                            - "source": The article's URL.
-                            - "image": An image URL related to the article.
-                            - "date": The publication date (YYYY-MM-DD).
+        **Ensure each news item includes**:
+        - "title": The headline of the article.
+        - "description": A **short** summary.
+        - "source": The article's URL.
+        - "image": The **first real image URL found in the article** (no placeholders like example.com).
+        - "date": The publication date (YYYY-MM-DD).
+        - "tags": One or multiple relevant tags from this list: ["Acquisition", "Partnership", "Funding", "Investment", "New Product", "New Client", "Market Expansion", "Regulation Update", "Innovation", "Hiring", "IPO"].
 
+        **IMPORTANT**:
+        - **The "image" field must be a valid direct URL from the article.**
+        - If no image is found, return **the most relevant industry-related stock photo**.
+        - Do NOT return "null" or example.com images.
 
-                            **Return this JSON format only**:
+                            **Return ONLY this JSON format**:
                             {
                                 "dernières_actualités": [
                                     {
@@ -221,14 +230,16 @@ async function getLatestNews(companyWebsite) {
                                         "description": "...",
                                         "source": "...",
                                         "image": "...",
-                                        "date": "..."
+                                        "date": "...",
+                                        "tags": ["..."]
                                     },
                                     {
                                         "title": "...",
                                         "description": "...",
                                         "source": "...",
                                         "image": "...",
-                                        "date": "..."
+                                        "date": "...",
+                                        "tags": ["..."]
                                     }
                                 ]
                             }
@@ -264,6 +275,7 @@ async function getLatestNews(companyWebsite) {
         return { error: "Erreur API Perplexity" };
     }
 }
+
 
 // 🚀 Route API pour récupérer les actualités d'une entreprise avec `companyWebsite`
 app.get("/api/company-info", async (req, res) => {

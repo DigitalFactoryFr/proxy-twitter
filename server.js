@@ -201,7 +201,7 @@ async function getLatestNews(companyWebsite) {
             "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 500,  // ✅ Limite la réponse à 500 tokens (ajuste si nécessaire)
+        max_tokens: 600,  // ✅ Limite la réponse à 600 tokens (ajuste si nécessaire)
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
             { role: "user", content: `Find recent news about ${companyWebsite} from blogs, press releases, or news sources.
@@ -214,7 +214,7 @@ async function getLatestNews(companyWebsite) {
                   "title": "...",
                   "description": "...",
                   "source": "...",  Name of the source (e.g., "BBC News")
-                  "url": "...", The **direct** link to the news article.
+                  "url": "...", The **direct** link to the news article (**fully valid and untruncated**
                   "date": "...",  Format: YYYY-MM-DD
                   "tags": ["..."],Relevant tags like "Funding", "Acquisition", "New Product"
                 }

@@ -221,6 +221,10 @@ app.get("/api/company-info", async (req, res) => {
             titre: result.title,
             source: result.link,
             description: result.snippet // Récupère seulement la description courte
+ 	image: imageUrl, // 🖼️ Image associée
+        date: publishedDate // 📅 Date de publication si dispo
+
+
         }));
 
 const prompt = `
@@ -233,12 +237,14 @@ const prompt = `
     - Si l'article est en français, écrire la description en français.
     - Si l'article est en anglais, écrire la description en anglais.
     - Si la langue de l'article est inconnue, écrire en anglais par défaut.
+    - Récupérer l'image et la date de publication si disponibles.
+    - Écrire chaque description **dans la langue de l'article**.
 
     ❗ Attention : Retournez uniquement un JSON bien structuré sans texte supplémentaire :
     {
-        "dernières_actualités": [
-            {"description": "Une phrase résumant l'actualité dans la langue de l'article", "source": "URL de l'article"},
-            {"description": "Une phrase résumant l'actualité dans la langue de l'article", "source": "URL de l'article"}
+     "dernières_actualités": [
+            {"description": "Résumé de l'actualité", "source": "URL", "image": "URL de l'image", "date": "AAAA-MM-JJ"},
+            {"description": "Résumé de l'actualité", "source": "URL", "image": "URL de l'image", "date": "AAAA-MM-JJ"}
         ]
     }
 `;

@@ -5,7 +5,6 @@ const fetch = require("node-fetch");
 const cors = require("cors");
 const cheerio = require('cheerio');
 const fs = require("fs");
-const cors = require("cors");
 const bodyParser = require("body-parser");
 
 
@@ -279,7 +278,6 @@ app.get("/api/company-info", async (req, res) => {
 const feedbackFile = "feedback.json";
 
 // ✅ Activer CORS pour éviter les problèmes avec Shopify ou d'autres domaines
-app.use(cors());
 app.use(bodyParser.json()); // ✅ Permet de lire les requêtes JSON
 
 // 📌 Charger les votes sauvegardés

@@ -5,6 +5,8 @@ const fetch = require("node-fetch");
 const cors = require("cors");
 const cheerio = require('cheerio');
 const fs = require("fs");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
 
 const app = express();
@@ -273,7 +275,12 @@ app.get("/api/company-info", async (req, res) => {
 
 
 // ✅ Gestion des Feedbacks (Like / Dislike) avec persistance
+
 const feedbackFile = "feedback.json";
+
+// ✅ Activer CORS pour éviter les problèmes avec Shopify ou d'autres domaines
+app.use(cors());
+app.use(bodyParser.json()); // ✅ Permet de lire les requêtes JSON
 
 // 📌 Charger les votes sauvegardés
 let feedback = { likes: 0, dislikes: 0 };
@@ -285,24 +292,30 @@ if (fs.existsSync(feedbackFile)) {
     }
 }
 
-// ✅ Récupérer les votes
+// ✅ Route GET : Récupérer les votes
 app.get("/api/feedback", (req, res) => {
     res.json(feedback);
 });
 
-// ✅ Mettre à jour les votes
+// ✅ Route POST : Mettre à jour les votes
 app.post("/api/feedback", (req, res) => {
     const { type } = req.body;
+
+    if (!type || (type !== "like" && type !== "dislike")) {
+        return res.status(400).json({ error: "Type invalide" });
+    }
+
     if (type === "like") feedback.likes++;
     if (type === "dislike") feedback.dislikes++;
 
-    // ✅ Sauvegarde sur disque
-    fs.writeFileSync(feedbackFile, JSON.stringify(feedback, null, 2));
-
-    res.json(feedback);
-});
-
-// ✅ Lancer le serveur Express
+    try {
+        fs.writeFileSync(feedbackFile, JSON.stringify(feedback, null, 2));
+        res.json(feedback);
+    } catch (error) {
+        console.error("❌ Erreur lors de la sauvegarde :", error);
+        res.status(500).json({ error: "Erreur lors de la sauvegarde" });
+    }
+});// ✅ Lancer le serveur Express
 app.listen(PORT, () => {
     console.log(`🚀 Serveur en écoute sur http://localhost:${PORT}`);
 });

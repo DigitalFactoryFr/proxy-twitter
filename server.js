@@ -3,6 +3,8 @@ const express = require("express");
 const axios = require("axios");
 const fetch = require("node-fetch");
 const cors = require("cors");
+const cheerio = require('cheerio');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -189,14 +191,37 @@ app.get("/api/company-info", async (req, res) => {
         return res.status(400).json({ error: "Paramètres 'companyName' ou 'companyWebsite' requis" });
     }
 
+
+async function getCompanyActivity(companyWebsite) {
     try {
+        const response = await axios.get(companyWebsite);
+        const $ = cheerio.load(response.data);
+
+        // Recherche dans les balises les plus courantes où l'activité est mentionnée
+        let activity = $('meta[name="description"]').attr('content') || // Meta Description
+                       $('title').text() || // Titre de la page
+                       $('h1').first().text() || // Premier H1
+                       $('h2').first().text(); // Premier H2
+
+        return activity || "technologie"; // Retourne une valeur par défaut si rien n'est trouvé
+    } catch (error) {
+        console.error("Erreur lors de la récupération de l'activité :", error);
+        return "technologie"; // Fallback en cas d'erreur
+    }
+}
+   
+
+ try {
         console.log(`🔍 Recherche d'informations sur : ${companyName} | Site : ${companyWebsite}`);
 
         // ✅ Construire la requête Google Custom Search avec le nom et le site web
         let query = "(";
    
-        if (companyWebsite) query += `site:${companyWebsite}`;
-        query += ") (actualités OR news OR article OR innovation OR expansion OR financement OR recrutement) after:2024-01-01";
+	const companyActivity = await getCompanyActivity(companyWebsite);
+
+	let query = `"${companyName}" OR site:${companyWebsite} ("${companyActivity}" OR "services" OR "produits") (actualités OR news OR article OR innovation OR financement) 	after:2024-01-01`;
+
+
 
         const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX}`;
 
@@ -231,26 +256,24 @@ const extractedResults = searchResults.map(result => {
 });
 
 
-const prompt = `
+const prompt = ` 
     Voici un résumé des résultats de recherche Google sur "${companyName || companyWebsite}":
     ${JSON.stringify(extractedResults, null, 2)}
 
-    - Pour chaque actualité, reformuler une description **courte et claire** en **une seule phrase**.
-    - Ne pas reprendre le titre original, mais résumer **le contenu de l'article**.
+    - Vérifie que chaque article parle bien de **${companyName}** et de son activité **(${companyActivity})**.
+    - Si un article ne parle pas de **${companyActivity}**, **ne l'inclus pas** dans la réponse.
+    - Priorise les articles sur les **produits, services, innovations ou investissements** de l’entreprise.
+    - Reformule chaque actualité en **une seule phrase courte et claire**.
     - Écrire chaque description **dans la même langue que l'article source**.
-    - Si l'article est en français, écrire la description en français.
-    - Si l'article est en anglais, écrire la description en anglais.
-    - Si la langue de l'article est inconnue, écrire en anglais par défaut.
-    - Récupérer l'image et la date de publication si disponibles.
 
-    ❗ Attention : Retournez uniquement un JSON bien structuré sans texte supplémentaire :
+    ❗ Retourne uniquement un JSON bien structuré :
     {
      "dernières_actualités": [
-            {"description": "Résumé de l'actualité", "source": "URL", "image": "URL de l'image", "date": "AAAA-MM-JJ"},
-            {"description": "Résumé de l'actualité", "source": "URL", "image": "URL de l'image", "date": "AAAA-MM-JJ"}
+            {"description": "Résumé pertinent", "source": "URL", "image": "URL", "date": "AAAA-MM-JJ"}
         ]
     }
 `;
+
 
 
 

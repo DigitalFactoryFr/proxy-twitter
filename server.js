@@ -185,24 +185,43 @@ app.get("/youtube-channel-info", async (req, res) => {
 // ✅ Route pour récupérer les actualités sur une entreprise
 // ✅ Fonction pour extraire l'activité d'une entreprise depuis son site web
 async function getCompanyActivity(companyWebsite) {
-    if (!companyWebsite) return "technologie"; // Fallback si l'URL est vide
+    if (!companyWebsite) return null; // On ne met plus de valeur statique
 
     try {
         const response = await axios.get(companyWebsite);
         const $ = cheerio.load(response.data);
 
-        // Recherche dans les balises les plus courantes où l'activité est mentionnée
-        let activity = $('meta[name="description"]').attr("content") || 
-                       $("title").text() || 
-                       $("h1").first().text() || 
-                       $("h2").first().text();
+        // 🔹 Extraire différentes informations
+        let metaDescription = $('meta[name="description"]').attr("content") || "";
+        let title = $("title").text() || "";
+        let h1 = $("h1").first().text() || "";
+        let h2 = $("h2").first().text() || "";
+        let firstParagraph = $("p").first().text() || "";
 
-        return activity || "technologie"; // Retourne une valeur par défaut si rien n'est trouvé
+        // 🔹 Combiner et nettoyer les textes
+        let rawActivityText = `${metaDescription} ${h1} ${h2} ${firstParagraph}`.trim();
+
+        // 🔹 Filtrer les mots inutiles (ex: "Bienvenue", "Accueil")
+        let filteredActivity = rawActivityText.replace(/(Bienvenue|Accueil|Nos solutions|Cliquez ici)/gi, "").trim();
+
+        // 🔹 Extraire les mots-clés les plus fréquents
+        let words = filteredActivity.split(/\s+/).map(word => word.toLowerCase());
+        let wordCounts = {};
+        words.forEach(word => {
+            if (word.length > 3) wordCounts[word] = (wordCounts[word] || 0) + 1;
+        });
+
+        // 🔹 Sélectionner les mots-clés les plus utilisés
+        let sortedWords = Object.keys(wordCounts).sort((a, b) => wordCounts[b] - wordCounts[a]);
+        let topKeywords = sortedWords.slice(0, 3).join(" "); // Garder les 3 mots-clés les plus fréquents
+
+        return topKeywords || null; // Retourner null si aucune info utile n'est trouvée
     } catch (error) {
         console.error("❌ Erreur lors de la récupération de l'activité :", error.message);
-        return "technologie"; // Retourne un fallback en cas d'erreur
+        return null;
     }
 }
+
 
 // ✅ Route pour récupérer les actualités sur une entreprise
 app.get("/api/company-info", async (req, res) => {
@@ -225,7 +244,8 @@ app.get("/api/company-info", async (req, res) => {
         }
 
         // ✅ Construire la requête Google Custom Search
-let query = `intitle:"${companyName}" intext:"${companyName}" ("${companyActivity}" OR "produits" OR "services") site:${encodeURIComponent(companyWebsite)} after:2024-01-01`;
+let query = `site:${encodeURIComponent(companyWebsite)} OR (intitle:"${companyName}" intext:"${companyName}" -"spa" -"doula" -"santé") ("${companyActivity}" OR "produits" OR "services") after:2024-01-01`;
+
 
 
         const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX}`;
@@ -239,9 +259,13 @@ let query = `intitle:"${companyName}" intext:"${companyName}" ("${companyActivit
             return res.status(500).json({ error: "Erreur lors de la requête Google." });
         }
 
-        if (!searchResults.length) {
-            return res.status(404).json({ error: "Aucune donnée trouvée sur Google." });
-        }
+    if (!searchResults.length) {
+    return res.status(404).json({
+        error: "Aucune donnée pertinente trouvée sur Google.",
+        suggestion: `Essayez de visiter le site officiel: ${companyWebsite}`
+    });
+}
+
 
         // ✅ Limiter les résultats à 3 articles pour éviter un prompt trop long
         searchResults = searchResults.slice(0, 3);
@@ -261,23 +285,25 @@ let query = `intitle:"${companyName}" intext:"${companyName}" ("${companyActivit
         });
 
         // ✅ Construire le prompt pour OpenAI
-        const prompt = ` 
-            Voici un résumé des résultats de recherche Google sur "${companyName || companyWebsite}":
-            ${JSON.stringify(extractedResults, null, 2)}
+      const prompt = ` 
+    Voici un résumé des résultats de recherche Google sur "${companyName || companyWebsite}":
+    ${JSON.stringify(extractedResults, null, 2)}
 
-            - Vérifie que chaque article parle bien de **${companyName}** et de son activité **(${companyActivity})**.
-            - Si un article ne parle pas de **${companyActivity}**, **ne l'inclus pas** dans la réponse.
-            - Priorise les articles sur les **produits, services, innovations ou investissements** de l’entreprise.
-            - Reformule chaque actualité en **une seule phrase courte et claire**.
-            - Écrire chaque description **dans la même langue que l'article source**.
+    - Vérifie que chaque article parle bien de **${companyName}** et de son activité **(${companyActivity})**.
+    - Si un article ne parle pas de **${companyActivity}**, **ne l'inclus pas**.
+    - Priorise les articles sur les **produits, services, innovations ou investissements** de l’entreprise.
+    - Reformule chaque actualité en **une seule phrase courte et claire**.
+    - Écrire chaque description **dans la même langue que l'article source**.
 
-            ❗ Retourne uniquement un JSON bien structuré :
-            {
-            "dernières_actualités": [
-                    {"description": "Résumé pertinent", "source": "URL", "image": "URL", "date": "AAAA-MM-JJ"}
-                ]
-            }
-        `;
+    ❗ **Retourne uniquement un JSON strictement valide, sans aucun texte avant ou après, en utilisant ce format précis :**
+    json:
+    {
+        "dernières_actualités": [
+            {"description": "Résumé pertinent", "source": "URL", "image": "URL", "date": "AAAA-MM-JJ"}
+        ]
+    }
+`;
+
 
         // ✅ Vérifier la taille du prompt avant d'envoyer à OpenAI
         console.log(`🔍 Taille du prompt OpenAI : ${prompt.length} caractères`);

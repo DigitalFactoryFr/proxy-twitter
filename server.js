@@ -215,7 +215,7 @@ async function getCompanyActivity(companyWebsite) {
         console.log(`🔍 Recherche d'informations sur : ${companyName} | Site : ${companyWebsite}`);
 
         // ✅ Construire la requête Google Custom Search avec le nom et le site web
-        let query = "(";
+     
    
 	const companyActivity = await getCompanyActivity(companyWebsite);
 

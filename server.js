@@ -207,11 +207,21 @@ async function getLatestNews(companyWebsite) {
             { role: "user", content: `Find recent news about ${companyWebsite} from blogs, press releases, or news sources.
 
             Return only JSON:
+          
             {
               "dernières_actualités": [
-                {"title": "...", "description": "...", "source": "...", "date": "...", "tags": ["..."]}
+                {
+                  "title": "...",
+                  "description": "...",
+                  "source": "...",  Name of the source (e.g., "BBC News")
+                  "url": "...", The **direct** link to the news article.
+                  "date": "...",  Format: YYYY-MM-DD
+                  "tags": ["..."],Relevant tags like "Funding", "Acquisition", "New Product"
+                }
               ]
             }
+
+       
             - Limit response to 3 items.` }
         ]
     },

@@ -13,6 +13,7 @@ const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const GOOGLE_SEARCH_API_KEY = process.env.GOOGLE_SEARCH_TOKEN;
 const GOOGLE_SEARCH_CX = process.env.GOOGLE_SEARCH_CX;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
 // ✅ Configuration CORS
 app.use(cors({ origin: "*" }));
@@ -30,6 +31,8 @@ console.log("🔍 GOOGLE_SEARCH_CX:", GOOGLE_SEARCH_CX ? "OK" : "NON DÉFINI");
 console.log("🐦 BEARER_TOKEN Twitter:", BEARER_TOKEN ? "OK" : "NON DÉFINI");
 console.log("🌍 GOOGLE_API_KEY:", GOOGLE_API_KEY ? "OK" : "NON DÉFINI");
 console.log("🤖 OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "OK" : "NON DÉFINI");
+console.log("🤖 PERPLEXITY_API_KEY:", process.env.PERPLEXITY_API_KEY ? "OK" : "NON DÉFINI");
+
 
 // ✅ Route principale Twitter
 app.get("/twitter/:username", async (req, res) => {
@@ -181,185 +184,76 @@ app.get("/youtube-channel-info", async (req, res) => {
 });
 
 
+ // ✅ Faire de recherche d'actualités avec Perplexity AI
 
-// ✅ Route pour récupérer les actualités sur une entreprise
-// ✅ Fonction pour extraire l'activité d'une entreprise depuis son site web
-async function getCompanyActivity(companyWebsite) {
-    if (!companyWebsite) return null; // On ne met plus de valeur statique
+
+async function getLatestNews(companyName) {
+    if (!PERPLEXITY_API_KEY) {
+        return { error: "Clé API Perplexity non définie." };
+    }
 
     try {
-        const response = await axios.get(companyWebsite);
-        const $ = cheerio.load(response.data);
+        console.log(`🔍 Recherche des dernières actualités pour : ${companyName}`);
 
-        // 🔹 Extraire différentes informations
-        let metaDescription = $('meta[name="description"]').attr("content") || "";
-        let title = $("title").text() || "";
-        let h1 = $("h1").first().text() || "";
-        let h2 = $("h2").first().text() || "";
-        let firstParagraph = $("p").first().text() || "";
+        const response = await axios.post(
+            "https://api.perplexity.ai/chat/completions",
+            {
+                model: "sonar-pro",
+                messages: [
+                    { role: "system", content: "Be precise and concise." },
+                    { 
+                        role: "user", 
+                        content: `Provide the latest news about ${companyName}. 
+                                  Return a structured JSON with:
+                                  - 'description' (concise summary)
+                                  - 'source' (news link)
+                                  - 'image' (article image URL if available)
+                                  - 'date' (publication date YYYY-MM-DD if available).
+                                  Return JSON format only.` 
+                    }
+                ]
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
 
-        // 🔹 Combiner et nettoyer les textes
-        let rawActivityText = `${metaDescription} ${h1} ${h2} ${firstParagraph}`.trim();
+        if (!response.data || !response.data.choices) {
+            return { error: "Réponse invalide de Perplexity AI" };
+        }
 
-        // 🔹 Filtrer les mots inutiles (ex: "Bienvenue", "Accueil")
-        let filteredActivity = rawActivityText.replace(/(Bienvenue|Accueil|Nos solutions|Cliquez ici)/gi, "").trim();
+        const parsedResponse = response.data.choices[0].message.content;
+        
+        try {
+            const newsData = JSON.parse(parsedResponse);
+            return newsData;
+        } catch (jsonError) {
+            console.error("❌ Erreur de parsing JSON :", parsedResponse);
+            return { error: "Format de réponse non valide." };
+        }
 
-        // 🔹 Extraire les mots-clés les plus fréquents
-        let words = filteredActivity.split(/\s+/).map(word => word.toLowerCase());
-        let wordCounts = {};
-        words.forEach(word => {
-            if (word.length > 3) wordCounts[word] = (wordCounts[word] || 0) + 1;
-        });
-
-        // 🔹 Sélectionner les mots-clés les plus utilisés
-        let sortedWords = Object.keys(wordCounts).sort((a, b) => wordCounts[b] - wordCounts[a]);
-        let topKeywords = sortedWords.slice(0, 3).join(" "); // Garder les 3 mots-clés les plus fréquents
-
-        return topKeywords || null; // Retourner null si aucune info utile n'est trouvée
     } catch (error) {
-        console.error("❌ Erreur lors de la récupération de l'activité :", error.message);
-        return null;
+        console.error("❌ Erreur API Perplexity :", error.response ? error.response.data : error.message);
+        return { error: "Erreur API Perplexity" };
     }
 }
 
-
-// ✅ Route pour récupérer les actualités sur une entreprise
+// 🚀 Route pour récupérer les actualités d'une entreprise
 app.get("/api/company-info", async (req, res) => {
     const companyName = req.query.companyName;
-    const companyWebsite = req.query.companyWebsite;
 
-    if (!companyName && !companyWebsite) {
-        return res.status(400).json({ error: "Paramètres 'companyName' ou 'companyWebsite' requis" });
+    if (!companyName) {
+        return res.status(400).json({ error: "Paramètre 'companyName' requis" });
     }
 
-    try {
-        console.log(`🔍 Recherche d'informations sur : ${companyName} | Site : ${companyWebsite}`);
-
-        // ✅ Obtenir l'activité de l'entreprise
-        let companyActivity = "technologie"; // Valeur par défaut
-        try {
-            companyActivity = await getCompanyActivity(companyWebsite);
-        } catch (error) {
-            console.error("❌ Impossible de récupérer l'activité, utilisation de la valeur par défaut.");
-        }
-
-        // ✅ Construire la requête Google Custom Search
-let query = `site:${encodeURIComponent(companyWebsite)} OR (intitle:"${companyName}" intext:"${companyName}" -"spa" -"doula" -"santé") ("${companyActivity}" OR "produits" OR "services") after:2024-01-01`;
-
-
-
-        const searchUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_CX}`;
-
-        let searchResults;
-        try {
-            const response = await axios.get(searchUrl);
-            searchResults = response.data.items || [];
-        } catch (googleError) {
-            console.error("❌ Erreur API Google :", googleError.message);
-            return res.status(500).json({ error: "Erreur lors de la requête Google." });
-        }
-
-    if (!searchResults.length) {
-    return res.status(404).json({
-        error: "Aucune donnée pertinente trouvée sur Google.",
-        suggestion: `Essayez de visiter le site officiel: ${companyWebsite}`
-    });
-}
-
-
-        // ✅ Limiter les résultats à 3 articles pour éviter un prompt trop long
-        searchResults = searchResults.slice(0, 3);
-
-        // ✅ Extraire uniquement les informations essentielles des résultats
-        const extractedResults = searchResults.map(result => {
-            let imageUrl = result.pagemap?.cse_image?.[0]?.src || result.pagemap?.cse_thumbnail?.[0]?.src || null;
-            let publishedDate = result.pagemap?.metatags?.[0]?.["article:published_time"] || result.snippet.match(/\d{4}-\d{2}-\d{2}/)?.[0] || null;
-
-            return {
-                titre: result.title,
-                source: result.link,
-                description: result.snippet,
-                image: imageUrl,
-                date: publishedDate
-            };
-        });
-
-        // ✅ Construire le prompt pour OpenAI
-      const prompt = ` 
-    Voici un résumé des résultats de recherche Google sur "${companyName || companyWebsite}":
-    ${JSON.stringify(extractedResults, null, 2)}
-
-    - Vérifie que chaque article parle bien de **${companyName}** et de son activité **(${companyActivity})**.
-    - Si un article ne parle pas de **${companyActivity}**, **ne l'inclus pas**.
-    - Priorise les articles sur les **produits, services, innovations ou investissements** de l’entreprise.
-    - Reformule chaque actualité en **une seule phrase courte et claire**.
-    - Écrire chaque description **dans la même langue que l'article source**.
-
-    ❗ **Retourne uniquement un JSON strictement valide, sans aucun texte avant ou après, en utilisant ce format précis :**
-    json:
-    {
-        "dernières_actualités": [
-            {"description": "Résumé pertinent", "source": "URL", "image": "URL", "date": "AAAA-MM-JJ"}
-        ]
-    }
-`;
-
-
-        // ✅ Vérifier la taille du prompt avant d'envoyer à OpenAI
-        console.log(`🔍 Taille du prompt OpenAI : ${prompt.length} caractères`);
-
-        if (prompt.length > 8000) {
-            return res.status(400).json({ error: "Le prompt est trop long. Nouvelle réduction nécessaire." });
-        }
-
-        // ✅ Vérifier que la clé OpenAI est bien définie
-        if (!OPENAI_API_KEY) {
-            return res.status(500).json({ error: "Clé OpenAI manquante" });
-        }
-
-        // ✅ Appel à OpenAI GPT-4
-        try {
-            const aiResponse = await axios.post(
-                "https://api.openai.com/v1/chat/completions",
-                {
-                    model: "gpt-4",
-                    messages: [{ role: "user", content: prompt }],
-                    max_tokens: 400
-                },
-                {
-                    headers: {
-                        "Authorization": `Bearer ${OPENAI_API_KEY}`,
-                        "Content-Type": "application/json"
-                    },
-                    timeout: 20000 // ⏳ Timeout de 20 secondes
-                }
-            );
-
-            if (!aiResponse.data.choices || aiResponse.data.choices.length === 0) {
-                return res.status(500).json({ error: "Réponse vide de OpenAI" });
-            }
-
-            let responseText = aiResponse.data.choices[0].message.content.trim();
-
-            try {
-                const finalData = JSON.parse(responseText);
-                console.log("✅ Résumé généré par OpenAI :", finalData);
-                res.json(finalData);
-            } catch (jsonError) {
-                console.error("❌ Erreur JSON OpenAI :", responseText);
-                res.status(500).json({ error: "Format de réponse OpenAI non valide.", raw: responseText });
-            }
-        } catch (openAiError) {
-            console.error("❌ Erreur API OpenAI :", openAiError.response ? openAiError.response.data : openAiError.message);
-            res.status(500).json({ error: "Erreur lors de la requête OpenAI" });
-        }
-    } catch (error) {
-        console.error("❌ Erreur inattendue :", error);
-        res.status(500).json({ error: "Erreur interne du serveur." });
-    }
+    const news = await getLatestNews(companyName);
+    res.json(news);
 });
 
-// ✅ Lancer le serveur
+// Lancer le serveur
 app.listen(PORT, () => {
     console.log(`🚀 Serveur en écoute sur http://localhost:${PORT}`);
 });

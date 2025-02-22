@@ -217,7 +217,9 @@ app.get("/api/company-info", async (req, res) => {
         searchResults = searchResults.slice(0, 3);
 
         // ✅ Extraire uniquement les informations essentielles des résultats
-        const extractedResults = searchResults.map(result => ({
+	const extractedResults = searchResults.map(result => {
+   	 let imageUrl = result.pagemap?.cse_image?.[0]?.src || null; // 🖼️ Image de l'article si disponible
+    	let publishedDate = result.pagemap?.metatags?.[0]?.['article:published_time'] || null; // 📅 Date de publication si disponible
             titre: result.title,
             source: result.link,
             description: result.snippet // Récupère seulement la description courte

@@ -485,12 +485,17 @@ app.get("/api/articles", async (req, res) => {
 // 📌 Route API pour récupérer les articles en fonction de la langue de Shopify
 app.get("/api/articles/shopify", async (req, res) => {
   try {
-    const { shopifyLang } = req.query;
+    const { shopifyLang, tag } = req.query;
     const language = shopifyLang || "en";
 
+    let whereClause = { language };
+    if (tag) {
+      whereClause.tags = { [Op.contains]: [tag] };
+    }
+
     const articles = await Article.findAll({
-      where: { language },
-      order: [["date", "DESC"]],
+      where: whereClause,
+      order: [["date", "DESC"]], // plus récent en premier
     });
 
     res.json(articles);
@@ -499,8 +504,6 @@ app.get("/api/articles/shopify", async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
-
-
 
 
 

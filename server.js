@@ -382,22 +382,22 @@ async function fetchLatestNews() {
         max_tokens: 600,  // Limite la réponse à 600 tokens (ajuste si nécessaire)
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Find recent news about from blogs, press releases, or news sources.
-
-            Return only JSON:
+            { role: "user", content: `Find the latest industry news in the last **48 hours** about Industry 4.0, IoT, SaaS, and AI industrial solutions. 
+Ensure articles are from **trusted sources** and are not duplicates of previous results.
+Return only JSON, strictly following this format:
           
             {
               "articles": [
                 {
-        "title": "...",
+     "title": "...",
       "description": "...",
       "image": "...",
       "tags": ["...", "..."],
       "date": "YYYY-MM-DD",
       "source": "...",
       "url": "...",
-      "language": "en"
-                }
+      "language": "fr"
+    }
               ]
             }
 

@@ -380,27 +380,39 @@ async function fetchLatestNews() {
         model: "sonar-pro",
         max_tokens: 600,
         messages: [
-          { role: "system", content: "Provide structured, concise responses." },
-          { 
-            role: "user", 
-            content: `Find recent news about Industry about 4.0, IoT, SaaS, AI industrial solutions.  
-            Return only JSON:
-            {
-              "articles": [
-                {
-                  "title": "...",
-                  "description": "...",
-                  "image": "...",
-                  "tags": ["...", "..."],
-                  "date": "YYYY-MM-DD",
-                  "source": "...",
-                  "url": "...",
-                  "language": "fr"
-                }
-              ]
-            }` 
-          }
-        ]
+  {
+    role: "system",
+    content: "Provide structured, concise responses. Output must be valid JSON only."
+  },
+  {
+    role: "user",
+    content: `
+Find recent news about Industry 4.0, IoT, SaaS, and AI industrial solutions.
+
+Your response must be strictly valid JSON. 
+No additional text, disclaimers, or code fences. 
+If no articles are found, return an empty array.
+
+Example format:
+
+{
+  "articles": [
+    {
+      "title": "...",
+      "description": "...",
+      "image": "...",
+      "tags": ["...", "..."],
+      "date": "YYYY-MM-DD",
+      "source": "...",
+      "url": "...",
+      "language": "fr"
+    }
+  ]
+}
+`
+  }
+]
+
       },
       {
         headers: {

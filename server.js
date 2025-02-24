@@ -375,14 +375,17 @@ async function fetchLatestNews() {
   }
 
   try {
-    const response = await axios.post(
+const now = new Date().toISOString();    
+const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
         max_tokens: 2000,  // Limite la réponse à 2000 tokens (ajuste si nécessaire)
+  temperature: 1.0, // 🔥 Encourage la diversité des réponses
+            refresh: true,
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Donne-moi uniquement les derniers articles de presse et articles de blogs publiés aujourd’hui dans la dernière heure sur les sujets suivants :  
+            { role: "user", content: `Donne-moi uniquement les derniers articles de presse et blogs publiés aujourd’hui dans les 3 dernières heures jusqu'à ${now} sur les sujets suivants : 
 - Industrie 4.0 en France  
 - Applications industrielles  
 - IoT industriel
@@ -397,11 +400,9 @@ async function fetchLatestNews() {
 - Nouvelles nominations 
 
 Instructions importantes :  
-- Ne retourne que des articles publiés aujourd’hui dans la dernière heure.  
+- Ne retourne que des articles publiés aujourd’hui dans les 3 dernières heures.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
-
 - Ne renvoie que des articles uniques (aucun doublon). 
-
 - Réponds uniquement avec du JSON strictement valide dans ce format :  
 
           

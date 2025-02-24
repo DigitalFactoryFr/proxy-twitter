@@ -382,7 +382,7 @@ async function fetchLatestNews() {
         max_tokens: 800,  // Limite la réponse à 800 tokens (ajuste si nécessaire)
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Donne-moi uniquement les derniers articles de presse publiés aujourd’hui dans les 3 dernières heures sur les sujets suivants :  
+            { role: "user", content: `Donne-moi uniquement les derniers articles de presse publiés aujourd’hui dans la dernière heure sur les sujets suivants :  
 - Industrie 4.0 en France  
 - Applications industrielles  
 - IoT industriel  
@@ -394,7 +394,7 @@ async function fetchLatestNews() {
 - Salons et événements industriels en cours ou à venir  
 
 Instructions importantes :  
-- Ne retourne que des articles publiés aujourd’hui dans les 3 dernières heures.  
+- Ne retourne que des articles publiés aujourd’hui dans la dernière heure.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
 - Priorise les sources fiables et reconnues.  
 - Ne renvoie que des articles uniques (aucun doublon). 

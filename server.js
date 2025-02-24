@@ -376,51 +376,43 @@ async function fetchLatestNews() {
   try {
     const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
-      {
-        model: "sonar-pro",
-        max_tokens: 600,
-        messages: [
-  {
-    role: "system",
-    content: "Provide structured, concise responses. Output must be valid JSON only."
-  },
-  {
-    role: "user",
-    content: `
-Find recent news about Industry 4.0, IoT, SaaS, and AI industrial solutions.
+    {
+        model: "sonar-pro",
+        max_tokens: 600,  // Limite la réponse à 600 tokens (ajuste si nécessaire)
+        messages: [
+            { role: "system", content: "Provide structured, concise responses." },
+            { role: "user", content: `Find recent news about from blogs, press releases, or news sources.
 
-Your response must be strictly valid JSON. 
-No additional text, disclaimers, or code fences. 
-If no articles are found, return an empty array.
-
-Example format:
-
-{
-  "articles": [
-    {
-      "title": "...",
+            Return only JSON:
+          
+            {
+              "articles": [
+                {
+        "title": "...",
       "description": "...",
       "image": "...",
       "tags": ["...", "..."],
       "date": "YYYY-MM-DD",
       "source": "...",
       "url": "...",
-      "language": "fr"
-    }
-  ]
-}
-`
-  }
-]
+      "language": "en"
+                }
+              ]
+            }
 
-      },
-      {
-        headers: {
-          "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+       
+            - Limit response to 3 items.` }
+        ]
+    },
+            {
+                headers: {
+                    "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            }
+        );
+
 
     if (!response.data || !response.data.choices) {
       throw new Error("Réponse invalide de Perplexity AI");
@@ -430,6 +422,9 @@ Example format:
 
     console.log("📥 Articles récupérés depuis Perplexity :", parsedResponse.articles);
     console.log("🔍 Réponse brute de Perplexity :", response.data);
+const rawContent = response.data.choices[0].message.content;
+console.log("RAW message content:", rawContent);
+
 
     return parsedResponse.articles || [];
   } catch (error) {

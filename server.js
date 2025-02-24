@@ -8,6 +8,7 @@ const cheerio = require('cheerio');
 const fs = require("fs");
 const bodyParser = require("body-parser");
 const { sequelize, Article } = require("./config/db");
+const { Op } = require("sequelize");
 
 
 const app = express();
@@ -505,7 +506,30 @@ app.get("/api/articles/shopify", async (req, res) => {
   }
 });
 
+// 📌 Route API pour filter les articles en fonction de tags
+app.get("/api/tags", async (req, res) => {
+  try {
+    // On ne récupère que la colonne "tags"
+    const articles = await Article.findAll({
+      attributes: ["tags"] // Uniquement la colonne "tags"
+    });
 
+    // On met tous les tags dans un Set (pour éviter les doublons)
+    const allTags = new Set();
+    articles.forEach(article => {
+      if (article.tags && Array.isArray(article.tags)) {
+        article.tags.forEach(tag => allTags.add(tag));
+      }
+    });
+
+    // On renvoie le tableau de tags uniques
+    const uniqueTags = [...allTags];
+    res.json(uniqueTags);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des tags :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
 
 
 // Lancer le serveur Express

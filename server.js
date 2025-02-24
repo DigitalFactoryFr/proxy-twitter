@@ -397,7 +397,8 @@ Instructions importantes :
 - Ne retourne que des articles publiés aujourd’hui dans les 3 dernières heures.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
 - Priorise les sources fiables et reconnues.  
-- Ne renvoie que des articles uniques (aucun doublon).  
+- Ne renvoie que des articles uniques (aucun doublon). 
+
 - Réponds uniquement avec du JSON strictement valide dans ce format :  
 
           
@@ -406,7 +407,7 @@ Instructions importantes :
                 {
      "title": "...",
       "description": "...",
-      "image": "...",
+      "image": "URL de l'image",
       "tags": ["...", "..."],
       "date": "YYYY-MM-DD",
       "source": "...",
@@ -450,24 +451,34 @@ console.log("RAW message content:", rawContent);
 }
 
 // 🔄 Mise à jour automatique des articles
-async function updateArticles() {
-  const articles = await fetchLatestNews();
-  if (!articles.length) {
-    console.log("🛑 Perplexity n'a renvoyé aucun article.");
-    return;
-  }
 
-  for (const article of articles) {
-    await Article.findOrCreate({
-      where: { url: article.url },
-      defaults: article,
-    });
-  }
-  console.log("✅ Articles mis à jour !");
-  
+
+async function updateArticles() {
+    const articles = await fetchLatestNews();
+    if (!articles.length) {
+        console.log("🛑 Perplexity n'a renvoyé aucun article.");
+        return;
+    }
+
+    for (const article of articles) {
+        if (!article.image) {
+            article.image = await fetchArticleImage(article.url); // Récupère une image si manquante
+        }
+        
+        await Article.findOrCreate({
+            where: { url: article.url },
+            defaults: article,
+        });
+    }
+    console.log("✅ Articles mis à jour !");
+
   const count = await Article.count();
   console.log("📊 Nombre total d'articles enregistrés en base :", count);
 }
+
+
+
+
 
 // 🏁 Appeler la première fois immédiatement
 updateArticles();
@@ -550,6 +561,26 @@ app.get("/api/tags", async (req, res) => {
   }
 });
 
+
+
+
+//2️⃣ Extraire l'image principale de l'article
+
+
+
+async function fetchArticleImage(url) {
+    try {
+        const { data } = await axios.get(url, { timeout: 5000 });
+        const $ = cheerio.load(data);
+        let imageUrl = $('meta[property="og:image"]').attr('content') || 
+                       $('meta[name="twitter:image"]').attr('content');
+
+        return imageUrl || ""; // Retourne une image si trouvée, sinon une chaîne vide
+    } catch (error) {
+        console.error("❌ Impossible de récupérer l'image :", error.message);
+        return "";
+    }
+}
 
 
 // Lancer le serveur Express

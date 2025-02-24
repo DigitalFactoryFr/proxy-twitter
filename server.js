@@ -376,7 +376,7 @@ async function fetchLatestNews() {
 
   try {
 const now = new Date();
-const pastHour = new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString();   
+const pastHour = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();   
 const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {

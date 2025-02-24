@@ -15,9 +15,9 @@ console.log("🔍 Vérification des variables pour Sequelize :", {
 
 // Création de la connexion à PostgreSQL
 const sequelize = new Sequelize(
-  process.env.DB_NAME,  // Base de données
-  process.env.DB_USER,  // Utilisateur
-  process.env.DB_PASS,  // Mot de passe
+  process.env.DB_NAME,   // Base de données
+  process.env.DB_USER,   // Utilisateur
+  process.env.DB_PASS,   // Mot de passe
   {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
@@ -28,17 +28,47 @@ const sequelize = new Sequelize(
 
 // 🔥 Définition du modèle Article
 const Article = sequelize.define("Article", {
-  title: { type: DataTypes.STRING, allowNull: false },
-  description: { type: DataTypes.TEXT, allowNull: false },
-  image: { type: DataTypes.STRING },
-  tags: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
-  date: { type: DataTypes.DATE, allowNull: false },
-  source: { type: DataTypes.STRING, allowNull: false },
-  url: { type: DataTypes.STRING, allowNull: false },
-  language: { type: DataTypes.STRING, allowNull: false },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  image: {
+    type: DataTypes.STRING
+  },
+  tags: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: false
+  },
+  date: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
+  source: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  url: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  language: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  // 🆕 Ajout du champ "companies" (tableau de strings, avec valeur par défaut)
+  companies: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: false,
+    defaultValue: []
+  }
 });
+
 
 // 📌 Synchronisation de la base de données
 sequelize.sync();
 
-module.exports = { sequelize, Article }; // ✅ Assure-toi que cette ligne est bien présente
+module.exports = { sequelize, Article };

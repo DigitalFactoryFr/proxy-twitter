@@ -376,7 +376,7 @@ async function fetchLatestNews() {
 
   try {
 const now = new Date();
-const pastHour = new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString();   
+const pastHour = new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString();   
 const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
@@ -384,6 +384,7 @@ const response = await axios.post(
         max_tokens: 2000,  // Limite la réponse à 2000 tokens (ajuste si nécessaire)
   temperature: 1.0, // 🔥 Encourage la diversité des réponses
             refresh: true,
+search: true,
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
             { role: "user", content: `Donne-moi uniquement les derniers articles de presse et blogs publiés aujourd’hui après ${pastHour} sur les sujets suivants : 
@@ -403,7 +404,8 @@ const response = await axios.post(
 Instructions importantes :  
 - Retourne des articles publiés après ${pastHour}.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
-- Ne renvoie que des articles uniques (aucun doublon). 
+- Ne renvoie que des articles uniques (aucun doublon).
+- Liste dans "companies" toutes les entreprises ou marques mentionnées.
 - Réponds uniquement avec du JSON strictement valide dans ce format :  
 
           
@@ -418,6 +420,7 @@ Instructions importantes :
       "source": "...",
       "url": "...",
       "language": "..."
+	"companies": ["...","..."],
     }
               ]
             }
@@ -459,22 +462,38 @@ console.log("RAW message content:", rawContent);
 
 
 async function updateArticles() {
-    const articles = await fetchLatestNews();
-    if (!articles.length) {
-        console.log("🛑 Perplexity n'a renvoyé aucun article.");
-        return;
+  const articles = await fetchLatestNews(); // <--- votre fonction qui appelle Perplexity
+  if (!articles.length) {
+    console.log("🛑 Perplexity n'a renvoyé aucun article.");
+    return;
+  }
+
+  for (const article of articles) {
+    // Vérifier / compléter l'image si besoin
+    if (!article.image) {
+      article.image = await fetchArticleImage(article.url); 
     }
 
-    for (const article of articles) {
-        if (!article.image) {
-            article.image = await fetchArticleImage(article.url); // Récupère une image si manquante
-        }
-        
-        await Article.findOrCreate({
-            where: { url: article.url },
-            defaults: article,
-        });
-    }
+    // Sauvegarder en base
+    // => findOrCreate ou upsert, selon votre logique
+    await Article.findOrCreate({
+      where: { url: article.url },
+      defaults: {
+        title:       article.title,
+        description: article.description,
+        source:      article.source,
+        date:        article.date,
+        url:         article.url,
+        image:       article.image,
+        language:    article.language,
+        tags:        article.tags,
+        companies:   article.companies,
+      },
+    });
+  }
+
+
+
     console.log("✅ Articles mis à jour !");
 
   const count = await Article.count();
@@ -496,17 +515,97 @@ setInterval(updateArticles, 3 * 60 * 60 * 1000);
 
 setInterval(updateArticles, 3 * 60 * 60 * 1000); // Actualisation toutes les 3h
 
+
 // 📢 Route API pour récupérer les articles avec filtres généraux
 app.get("/api/articles", async (req, res) => {
   try {
-    const { category, tag, language } = req.query;
+    const {
+      category,   // ex: ?category=IoT
+      tag,        // ex: ?tag=Innovation
+      language,   // ex: ?language=fr
+      source,     // ex: ?source=Le+Monde
+      company,    // ex: ?company=Bosch
+      dateRange,  // 'today' | 'this_week' | 'this_month' | 'this_year' | 'custom'
+      startDate,
+      endDate,
+    } = req.query;
+
     let whereClause = {};
 
-    if (category) whereClause.tags = { [Op.contains]: [category] };
-    if (tag) whereClause.tags = { [Op.contains]: [tag] };
-    if (language) whereClause.language = language;
+    // 1. Filtres par tags
+    if (category) {
+      whereClause.tags = { [Op.contains]: [category] };
+    }
+    if (tag) {
+      whereClause.tags = { [Op.contains]: [tag] };
+    }
 
-    const articles = await Article.findAll({ where: whereClause, order: [["date", "DESC"]] });
+    // 2. Filtre par language si présent
+    if (language) {
+      whereClause.language = language;
+    }
+
+    // 3. Filtre par source (partiel, insensible à la casse)
+    if (source) {
+      whereClause.source = { [Op.iLike]: `%${source}%` };
+    }
+
+    // 4. Filtre par company (tableau "companies")
+    //    => On veut un match exact dans le tableau
+    if (company) {
+      whereClause.companies = { [Op.contains]: [company] };
+    }
+
+    // 5. Filtre par période
+    if (dateRange && dateRange !== "custom") {
+      const now = new Date();
+      let start = null;
+      let end = new Date(); // fin = maintenant
+
+      switch (dateRange) {
+        case "today": {
+          // minuit du jour courant
+          start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+          break;
+        }
+        case "this_week": {
+          // lundi de la semaine courante
+          const dayOfWeek = now.getDay(); // 0=dim, 1=lundi
+          const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+          start = new Date(now.setDate(diff));
+          start.setHours(0, 0, 0, 0);
+          break;
+        }
+        case "this_month": {
+          // 1er jour du mois
+          start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+          break;
+        }
+        case "this_year": {
+          // 1er janvier de l'année
+          start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
+          break;
+        }
+      }
+
+      if (start) {
+        whereClause.date = { [Op.between]: [start, end] };
+      }
+    }
+
+    // 6. Si dateRange=custom, on prend startDate et endDate
+    if (dateRange === "custom" && startDate && endDate) {
+      whereClause.date = {
+        [Op.between]: [ new Date(startDate), new Date(endDate) ]
+      };
+    }
+
+    // 7. Requête en base
+    const articles = await Article.findAll({
+      where: whereClause,
+      order: [["date", "DESC"]]
+    });
+
     res.json(articles);
   } catch (error) {
     console.error("❌ Erreur récupération articles :", error.message);
@@ -514,20 +613,86 @@ app.get("/api/articles", async (req, res) => {
   }
 });
 
+
 // 📌 Route API pour récupérer les articles en fonction de la langue de Shopify
+
 app.get("/api/articles/shopify", async (req, res) => {
   try {
-    const { shopifyLang, tag } = req.query;
+    // On récupère shopifyLang et autres filtres
+    const {
+      shopifyLang,
+      tag,
+      source,
+      company,
+      dateRange,
+      startDate,
+      endDate
+    } = req.query;
+
+    // Langue par défaut = "en" si non spécifié
     const language = shopifyLang || "en";
 
+    // whereClause impose la langue
     let whereClause = { language };
+
+    // Filtre par tag
     if (tag) {
       whereClause.tags = { [Op.contains]: [tag] };
     }
 
+    // Filtre par source
+    if (source) {
+      whereClause.source = { [Op.iLike]: `%${source}%` };
+    }
+
+    // Filtre par companies
+    if (company) {
+      whereClause.companies = { [Op.contains]: [company] };
+    }
+
+    // Gestion des dates
+    if (dateRange && dateRange !== "custom") {
+      const now = new Date();
+      let start = null;
+      let end = new Date();
+
+      switch (dateRange) {
+        case "today": {
+          start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+          break;
+        }
+        case "this_week": {
+          const dayOfWeek = now.getDay();
+          const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+          start = new Date(now.setDate(diff));
+          start.setHours(0, 0, 0, 0);
+          break;
+        }
+        case "this_month": {
+          start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+          break;
+        }
+        case "this_year": {
+          start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
+          break;
+        }
+      }
+
+      if (start) {
+        whereClause.date = { [Op.between]: [start, end] };
+      }
+    }
+
+    if (dateRange === "custom" && startDate && endDate) {
+      whereClause.date = {
+        [Op.between]: [ new Date(startDate), new Date(endDate) ]
+      };
+    }
+
+    // Requête
     const articles = await Article.findAll({
       where: whereClause,
-      order: [["date", "DESC"]], // plus récent en premier
+      order: [["date", "DESC"]], // plus récents en premier
     });
 
     res.json(articles);
@@ -538,27 +703,30 @@ app.get("/api/articles/shopify", async (req, res) => {
 });
 
 
+
+
 // 📌 Route API pour récupérer les tags en fonction de la langue Shopify
+
 app.get("/api/tags", async (req, res) => {
   try {
     const { shopifyLang } = req.query;
     const language = shopifyLang || "en"; // Par défaut, l'anglais
 
-    // Récupérer uniquement les tags des articles qui correspondent à la langue
+    // Récupérer uniquement les tags des articles de la langue
     const articles = await Article.findAll({
       attributes: ["tags"],
-      where: { language }, // Filtrage par langue
+      where: { language }, 
     });
 
-    // Extraire tous les tags et les rendre uniques
+    // Extraire tous les tags
     const allTags = new Set();
     articles.forEach(article => {
-      if (article.tags && Array.isArray(article.tags)) {
+      if (Array.isArray(article.tags)) {
         article.tags.forEach(tag => allTags.add(tag));
       }
     });
 
-    // Convertir en tableau et renvoyer la réponse
+    // Conversion en tableau
     res.json([...allTags]);
   } catch (error) {
     console.error("❌ Erreur lors de la récupération des tags :", error);
@@ -566,6 +734,34 @@ app.get("/api/tags", async (req, res) => {
   }
 });
 
+
+// 📌 Route API pour récupérer les entreprises (companies) en fonction de la langue Shopify
+app.get("/api/companies", async (req, res) => {
+  try {
+    const { shopifyLang } = req.query;
+    const language = shopifyLang || "en"; // Par défaut, l'anglais
+
+    // Récupérer uniquement la liste des companies pour les articles de la langue
+    const articles = await Article.findAll({
+      attributes: ["companies"],
+      where: { language },
+    });
+
+    // Extraire toutes les entreprises et les rendre uniques
+    const allCompanies = new Set();
+    articles.forEach(article => {
+      if (Array.isArray(article.companies)) {
+        article.companies.forEach(company => allCompanies.add(company));
+      }
+    });
+
+    // Convertir en tableau et renvoyer la réponse
+    res.json([...allCompanies]);
+  } catch (error) {
+    console.error("❌ Erreur lors de la récupération des companies :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
 
 
 

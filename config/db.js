@@ -69,6 +69,7 @@ const Article = sequelize.define("Article", {
 
 
 // 📌 Synchronisation de la base de données
-sequelize.sync();
+sequelize.sync({ alter: true });
+
 
 module.exports = { sequelize, Article };

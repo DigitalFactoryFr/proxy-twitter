@@ -379,7 +379,7 @@ async function fetchLatestNews() {
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 800,  // Limite la réponse à 600 tokens (ajuste si nécessaire)
+        max_tokens: 800,  // Limite la réponse à 800 tokens (ajuste si nécessaire)
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
             { role: "user", content: `Donne-moi uniquement les derniers articles de presse publiés aujourd’hui dans les 3 dernières heures sur les sujets suivants :  
@@ -521,15 +521,20 @@ app.get("/api/articles/shopify", async (req, res) => {
   }
 });
 
-// 📌 Route API pour filter les articles en fonction de tags
+
+// 📌 Route API pour récupérer les tags en fonction de la langue Shopify
 app.get("/api/tags", async (req, res) => {
   try {
-    // On ne récupère que la colonne "tags"
+    const { shopifyLang } = req.query;
+    const language = shopifyLang || "en"; // Par défaut, l'anglais
+
+    // Récupérer uniquement les tags des articles qui correspondent à la langue
     const articles = await Article.findAll({
-      attributes: ["tags"] // Uniquement la colonne "tags"
+      attributes: ["tags"],
+      where: { language }, // Filtrage par langue
     });
 
-    // On met tous les tags dans un Set (pour éviter les doublons)
+    // Extraire tous les tags et les rendre uniques
     const allTags = new Set();
     articles.forEach(article => {
       if (article.tags && Array.isArray(article.tags)) {
@@ -537,14 +542,14 @@ app.get("/api/tags", async (req, res) => {
       }
     });
 
-    // On renvoie le tableau de tags uniques
-    const uniqueTags = [...allTags];
-    res.json(uniqueTags);
+    // Convertir en tableau et renvoyer la réponse
+    res.json([...allTags]);
   } catch (error) {
-    console.error("Erreur lors de la récupération des tags :", error);
+    console.error("❌ Erreur lors de la récupération des tags :", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
 
 
 // Lancer le serveur Express

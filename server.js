@@ -375,7 +375,8 @@ async function fetchLatestNews() {
   }
 
   try {
-const now = new Date().toISOString();    
+const now = new Date();
+const pastHour = new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString();   
 const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
@@ -385,7 +386,7 @@ const response = await axios.post(
             refresh: true,
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Donne-moi uniquement les derniers articles de presse et blogs publiés aujourd’hui dans les 3 dernières heures jusqu'à ${now} sur les sujets suivants : 
+            { role: "user", content: `Donne-moi uniquement les derniers articles de presse et blogs publiés aujourd’hui après ${pastHour} sur les sujets suivants : 
 - Industrie 4.0 en France  
 - Applications industrielles  
 - IoT industriel
@@ -400,7 +401,7 @@ const response = await axios.post(
 - Nouvelles nominations 
 
 Instructions importantes :  
-- Ne retourne que des articles publiés aujourd’hui dans les 3 dernières heures.  
+- Retourne des articles publiés après ${pastHour}.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
 - Ne renvoie que des articles uniques (aucun doublon). 
 - Réponds uniquement avec du JSON strictement valide dans ce format :  

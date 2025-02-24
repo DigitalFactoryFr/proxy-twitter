@@ -379,28 +379,27 @@ async function fetchLatestNews() {
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 600,  // Limite la réponse à 600 tokens (ajuste si nécessaire)
+        max_tokens: 800,  // Limite la réponse à 600 tokens (ajuste si nécessaire)
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Donne-moi **uniquement** les **derniers articles de presse** publiés **aujourd’hui** **dans les 3 dernières heures** sur les sujets suivants :  
-- **Industrie 4.0 en France**  
-- **Applications industrielles**  
-- **IoT industriel**  
-- **Automatisation et digitalisation de l'industrie**  
-- **Levée de fonds dans l'industrie**  
-- **Acquisitions et fusions d'entreprises industrielles**  
-- **Lancement de nouveaux produits industriels**  
-- **Partenariats stratégiques entre entreprises industrielles**  
-- **Salons et événements industriels en cours ou à venir**  
+            { role: "user", content: `Donne-moi uniquement les derniers articles de presse publiés aujourd’hui dans les 3 dernières heures sur les sujets suivants :  
+- Industrie 4.0 en France  
+- Applications industrielles  
+- IoT industriel  
+- Automatisation et digitalisation de l'industrie  
+- Levée de fonds dans l'industrie  
+- Acquisitions et fusions d'entreprises industrielles  
+- Lancement de nouveaux produits industriels  
+- Partenariats stratégiques entre entreprises industrielles  
+- Salons et événements industriels en cours ou à venir  
 
-🚨 **Instructions importantes** :  
-- **Ne retourne que des articles publiés aujourd’hui dans les 3 dernières heures** 📅.  
-- **N'inclus aucun article plus ancien ou publié en dehors de cette période.**  
-- **Priorise les sources fiables et reconnues.**  
-- **Ne renvoie que des articles uniques (aucun doublon).**  
-- **Réponds uniquement avec du JSON strictement valide** dans ce format :  
+Instructions importantes :  
+- Ne retourne que des articles publiés aujourd’hui dans les 3 dernières heures.  
+- N'inclus aucun article plus ancien ou publié en dehors de cette période.  
+- Priorise les sources fiables et reconnues.  
+- Ne renvoie que des articles uniques (aucun doublon).  
+- Réponds uniquement avec du JSON strictement valide dans ce format :  
 
-\`\`\`json
           
             {
               "articles": [
@@ -412,13 +411,13 @@ async function fetchLatestNews() {
       "date": "YYYY-MM-DD",
       "source": "...",
       "url": "...",
-      "language": "fr"
+      "language": "..."
     }
               ]
             }
 
        
-            - Limit response to 3 items.` }
+            - Limiter les répondes à 3 articles.` }
         ]
     },
             {

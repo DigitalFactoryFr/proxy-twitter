@@ -418,7 +418,7 @@ Instructions importantes :
             }
 
        
-            - Limiter les répondes à 3 articles.` }
+            - Limiter les réponses à 3 articles.` }
         ]
     },
             {

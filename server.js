@@ -379,7 +379,7 @@ async function fetchLatestNews() {
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 800,  // Limite la réponse à 800 tokens (ajuste si nécessaire)
+        max_tokens: 2000,  // Limite la réponse à 2000 tokens (ajuste si nécessaire)
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
             { role: "user", content: `Donne-moi uniquement les derniers articles de presse et articles de blogs publiés aujourd’hui dans la dernière heure sur les sujets suivants :  
@@ -399,7 +399,7 @@ async function fetchLatestNews() {
 Instructions importantes :  
 - Ne retourne que des articles publiés aujourd’hui dans la dernière heure.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
-- Priorise les sources fiables.  
+
 - Ne renvoie que des articles uniques (aucun doublon). 
 
 - Réponds uniquement avec du JSON strictement valide dans ce format :  
@@ -421,7 +421,7 @@ Instructions importantes :
             }
 
        
-            - Limiter les réponses à 3 articles.` }
+            - Limiter les réponses à 10 articles.` }
         ]
     },
             {

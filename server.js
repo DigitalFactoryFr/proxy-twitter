@@ -624,7 +624,8 @@ app.get("/api/articles", async (req, res) => {
       whereClause.tags = { [Op.contains]: [category] };
     }
     if (tag) {
-      whereClause.tags = { [Op.contains]: [tag] };
+      whereClause.tags = { [Op.contains]: [JSON.stringify(tag)] };
+
     }
 
     // 2. Filtre par language si présent
@@ -724,7 +725,8 @@ app.get("/api/articles/shopify", async (req, res) => {
 
     // Filtre par tag
     if (tag) {
-      whereClause.tags = { [Op.contains]: [tag] };
+      whereClause.tags = { [Op.contains]: [JSON.stringify(tag)] };
+
     }
 
     // Filtre par source

@@ -417,6 +417,7 @@ search: true,
 - Exclude articles that do not match the date or topic criteria.  
 - Ensure all articles are unique (no duplicates).  
 - Extract company names from the articles and list them in the "companies" field.  
+- The "language" field must always be lowercase (e.g., "en", "fr").
 - Respond strictly in valid JSON in the following format :  
 
           
@@ -430,7 +431,7 @@ search: true,
       "date": "YYYY-MM-DD HH:mm:ss",
       "source": "...",
       "url": "...",
-      "language": "...", Fr, En,...
+      "language": "...", 
 	"companies": ["...","..."],
     }
               ]

@@ -580,7 +580,7 @@ if (!article.image) {
         url:         article.url,
         image:       article.image,
         language:    article.language,
-        tags:        article.tags,
+        tags:        Array.isArray(article.tags) ? article.tags : [article.tags], // ✅ Corrige l'insertion
         companies:   article.companies,
       },
     });

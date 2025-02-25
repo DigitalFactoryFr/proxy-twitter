@@ -397,7 +397,7 @@ const response = await axios.post(
 search: true,
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Retrieve only English-language press articles and blog posts published between on Febraury 2025 on the following topics:  
+            { role: "user", content: `Retrieve only press articles and blog posts published in February 2025 on the following topics :  
 - Industry 4.0  
 - Industrial applications  
 - Industrial IoT  
@@ -413,7 +413,7 @@ search: true,
 
 📌 Important Instructions: 
 - Return only articles published in English.  
-- Only include articles published on this period  
+- Only include articles published in February 2025.  
 - Exclude articles that do not match the date or topic criteria.  
 - Ensure all articles are unique (no duplicates).  
 - Extract company names from the articles and list them in the "companies" field.  

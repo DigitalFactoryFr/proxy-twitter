@@ -378,7 +378,7 @@ async function fetchLatestNews() {
 const now = new Date();
 const currentHour = now.getHours();
 // On prend deux heures de moins
-let blockStart = currentHour - 2; 
+let blockStart = currentHour - 700; 
 
 if (blockStart < 0) {
   blockStart = 0; // ou blockStart += 24 si vous voulez une boucle sur 24h
@@ -397,7 +397,7 @@ const response = await axios.post(
 search: true,
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Donne-moi uniquement les articles de presse et blogs publiés ${dateRangeText} sur les sujets suivants : 
+            { role: "user", content: `Donne-moi uniquement les articles de presse et blogs publiés le 18/12/2025 sur les sujets suivants : 
 - Industrie 4.0 en France  
 - Applications industrielles  
 - IoT industriel
@@ -413,7 +413,7 @@ search: true,
 
 Instructions importantes :  
 - Donnes impérativement des résultats d'article
-- Retourne des articles publiés uniquement ${dateRangeText}.  
+- Retourne des articles publiés uniquement dans la période demandée.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
 - Ne renvoie que des articles uniques (aucun doublon).
 - Liste dans "companies" toutes les entreprises ou marques mentionnées.

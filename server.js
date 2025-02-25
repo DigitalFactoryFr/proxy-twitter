@@ -458,6 +458,7 @@ top_p: 0.9,
 - Incluez une diversité maximale dans les sujets abordés, sans répétition.  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
 - Ne retourner que des articles en anglais, français, allemand ou espagnol ("en", "fr", "de", "es"). Exclure toute autre langue.
+- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
 - Répondre strictement en JSON valide au format suivant :  
 
           

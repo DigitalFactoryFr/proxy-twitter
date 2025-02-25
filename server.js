@@ -456,7 +456,7 @@ Instructions importantes :
             ${[...seenArticles].map(url => `- ${url}`).join("\n")}
 - Inclure au moins 3 articles en anglais ("en"), 3 articles en français ("fr"), 1 articles en allemand ("de"), et 1 articles en espagnol ("es"), si disponibles.
 - Si moins de 10 articles pertinents sont trouvés, élargir légèrement la recherche aux sujets connexes tout en restant dans les langues spécifiées pour compléter la liste.
-- Prioriser les articles correspondant strictement aux sujets demandés avant d’élargir la recherche.
+- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.
 - Incluez une diversité maximale dans les sujets abordés, sans répétition.  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
 - Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  

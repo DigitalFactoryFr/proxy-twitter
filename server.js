@@ -396,29 +396,28 @@ const response = await axios.post(
             refresh: true,
 search: true,
         messages: [
-            { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Retrieve only press articles and blog posts published in February 2025 on the following topics :  
-- Industry 4.0  
-- Industrial applications  
-- Industrial IoT  
-- Industrial software  
-- Industrial startups  
-- Automation and digitalization in the industry  
-- Industrial fundraising  
-- Mergers and acquisitions in the industrial sector  
-- Launch of new industrial products  
-- Strategic partnerships between industrial companies  
-- Ongoing or upcoming industrial trade shows and events  
-- New executive appointments  
+            { role: "system", content: "Fournissez des réponses structurées et concises." },
+            { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement ${dateRangeText}, sur les sujets suivants :  
+- Industrie 4.0  
+- Applications industrielles  
+- IoT industriel  
+- Logiciels industriels  
+- Startups industrielles  
+- Automatisation et digitalisation dans l'industrie  
+- Levées de fonds industrielles  
+- Fusions et acquisitions dans le secteur industriel  
+- Lancements de nouveaux produits industriels  
+- Partenariats stratégiques entre entreprises industrielles  
+- Salons et événements industriels en cours ou à venir  
+- Nominations de nouveaux dirigeants  
 
-📌 Important Instructions: 
-- Return only articles published in English.  
-- Only include articles published in February 2025.  
-- Exclude articles that do not match the date or topic criteria.  
-- Ensure all articles are unique (no duplicates).  
-- Extract company names from the articles and list them in the "companies" field.  
-- The "language" field must always be lowercase (e.g., "en", "fr").
-- Respond strictly in valid JSON in the following format :  
+📌 Instructions importantes :  
+- Retourner uniquement les articles publiés ${dateRangeText}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Le champ "language" doit toujours être en minuscule (ex. : "en", "fr").  
+- Répondre strictement en JSON valide au format suivant :  
 
           
             {
@@ -432,13 +431,13 @@ search: true,
       "source": "...",
       "url": "...",
       "language": "...", 
-	"companies": ["...","..."],
+	"companies": ["...","..."]
     }
               ]
             }
 
        
-            - Return at least 10 articles.` }
+            ` }
         ]
     },
             {

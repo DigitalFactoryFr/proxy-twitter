@@ -397,27 +397,27 @@ const response = await axios.post(
 search: true,
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Donne-moi uniquement les articles de presse et blogs publiés entre le 1/2/2025 et le 22/2/2025 sur les sujets suivants : 
-- Industrie 4.0 en France  
-- Applications industrielles  
-- IoT industriel
-- Logiciels industriels
-- Startup industrielles  
-- Automatisation et digitalisation de l'industrie  
-- Levée de fonds dans l'industrie  
-- Acquisitions et fusions d'entreprises industrielles  
-- Lancement de nouveaux produits industriels  
-- Partenariats stratégiques entre entreprises industrielles  
-- Salons et événements industriels en cours ou à venir 
-- Nouvelles nominations 
+            { role: "user", content: `Retrieve only English-language press articles and blog posts published between on Febraury 2025 on the following topics:  
+- Industry 4.0  
+- Industrial applications  
+- Industrial IoT  
+- Industrial software  
+- Industrial startups  
+- Automation and digitalization in the industry  
+- Industrial fundraising  
+- Mergers and acquisitions in the industrial sector  
+- Launch of new industrial products  
+- Strategic partnerships between industrial companies  
+- Ongoing or upcoming industrial trade shows and events  
+- New executive appointments  
 
-Instructions importantes :  
-- Donnes impérativement des résultats d'article
-- Retourne des articles publiés uniquement dans la période demandée.  
-- N'inclus aucun article plus ancien ou publié en dehors de cette période.  
-- Ne renvoie que des articles uniques (aucun doublon).
-- Liste dans "companies" toutes les entreprises ou marques mentionnées.
-- Réponds uniquement avec du JSON strictement valide dans ce format :  
+📌 Important Instructions: 
+- Return only articles published in English.  
+- Only include articles published on this period  
+- Exclude articles that do not match the date or topic criteria.  
+- Ensure all articles are unique (no duplicates).  
+- Extract company names from the articles and list them in the "companies" field.  
+- Respond strictly in valid JSON in the following format: :  
 
           
             {

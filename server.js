@@ -391,7 +391,7 @@ const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 12000,  // Limite la réponse à 12000 tokens (ajuste si nécessaire)
+        max_tokens: 3000,  // Limite la réponse à 12000 tokens (ajuste si nécessaire)
   temperature: 1.0, // 🔥 Encourage la diversité des réponses
             refresh: true,
 search: true,
@@ -399,7 +399,8 @@ search: true,
             { role: "system", content: "Fournissez des réponses structurées et concises." },
             { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement ${dateRangeText}, sur les sujets suivants :  
 - Industrie 4.0  
-- Applications industrielles  
+- Applications industrielles
+- SaaS industrielle  
 - IoT industriel  
 - Logiciels industriels  
 - Startups industrielles  
@@ -416,6 +417,9 @@ search: true,
 - Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Rechercher d'abord des articles en français ("fr").
+- Si moins de 10 articles sont trouvés en français, compléter avec des articles en anglais ("en").
+- Si toujours insuffisant, ajouter des articles en espagnol ("es"), puis en allemand ("de").
 - Le champ "language" doit toujours être en minuscule (ex. : "en", "fr", de, es).  
 - Ne retourner que des articles en anglais, français, allemand ou espagnol ("en", "fr", "de", "es"). Exclure toute autre langue.
 - Répondre strictement en JSON valide au format suivant :  
@@ -539,12 +543,7 @@ async function updateArticles() {
 updateArticles();
 
 // 🔄 Puis répéter toutes les 2 heures
-setInterval(updateArticles, 2 * 60 * 60 * 1000);
-
-
-
-
-setInterval(updateArticles, 2 * 60 * 60 * 1000); // Actualisation toutes les 2h
+setInterval(updateArticles, 15 * 60 * 1000); // Actualisation toutes les 15 minutes
 
 
 // 📢 Route API pour récupérer les articles avec filtres généraux

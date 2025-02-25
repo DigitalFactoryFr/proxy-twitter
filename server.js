@@ -378,7 +378,7 @@ async function fetchLatestNews() {
 const now = new Date();
 const currentHour = now.getHours();
 // On prend deux heures de moins
-let blockStart = currentHour - 700; 
+let blockStart = currentHour - 2; 
 
 if (blockStart < 0) {
   blockStart = 0; // ou blockStart += 24 si vous voulez une boucle sur 24h
@@ -417,7 +417,7 @@ search: true,
 - Exclude articles that do not match the date or topic criteria.  
 - Ensure all articles are unique (no duplicates).  
 - Extract company names from the articles and list them in the "companies" field.  
-- Respond strictly in valid JSON in the following format: :  
+- Respond strictly in valid JSON in the following format :  
 
           
             {
@@ -430,14 +430,14 @@ search: true,
       "date": "YYYY-MM-DD HH:mm:ss",
       "source": "...",
       "url": "...",
-      "language": "..."
+      "language": "...", Fr, En,...
 	"companies": ["...","..."],
     }
               ]
             }
 
        
-            - Donnes impérativement 10 articles.` }
+            - Return at least 10 articles.` }
         ]
     },
             {
@@ -455,25 +455,37 @@ search: true,
     }
 const rawContent = response.data.choices[0].message.content;
 console.log("🔍 Contenu brut de la réponse Perplexity :", rawContent);
-if (!rawContent.trim().startsWith("{")) {
-    console.error("❌ La réponse Perplexity n'est pas du JSON !");
+
+let parsedResponse;
+try {
+    // Trouver la position du premier { pour extraire uniquement le JSON
+    const jsonStart = rawContent.indexOf("{");
+    if (jsonStart === -1) {
+        throw new Error("Aucun JSON détecté dans la réponse !");
+    }
+
+    const jsonString = rawContent.slice(jsonStart); // On prend tout à partir du premier '{'
+
+    parsedResponse = JSON.parse(jsonString);
+
+    if (!parsedResponse.articles || !Array.isArray(parsedResponse.articles)) {
+        throw new Error("Le champ 'articles' est manquant ou mal formaté !");
+    }
+} catch (error) {
+    console.error("❌ La réponse Perplexity n'est pas un JSON valide :", error.message);
     return [];
 }
 
-    const parsedResponse = JSON.parse(response.data.choices[0].message.content);
 
-    console.log("📥 Articles récupérés depuis Perplexity :", parsedResponse.articles);
- console.log("🔍 Réponse brute complète :", JSON.stringify(response.data, null, 2));
+console.log("📥 Articles récupérés depuis Perplexity :", parsedResponse.articles);
+console.log("🔍 Réponse brute complète :", JSON.stringify(response.data, null, 2));
 console.dir(response.data, { depth: null, colors: true });
 
-console.log("RAW message content:", rawContent);
-
-
-    return parsedResponse.articles || [];
-  } catch (error) {
+return parsedResponse.articles || [];
+} catch (error) {
     console.error("❌ Erreur API Perplexity :", error.message);
     return [];
-  }
+}
 }
 
 // 🔄 Mise à jour automatique des articles

@@ -413,10 +413,11 @@ search: true,
 
 📌 Instructions importantes :  
 - Retourner uniquement les articles publiés ${dateRangeText}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Le champ "language" doit toujours être en minuscule (ex. : "en", "fr").  
+- Le champ "language" doit toujours être en minuscule (ex. : "en", "fr", de, es).  
+- Ne retourner que des articles en anglais, français, allemand ou espagnol ("en", "fr", "de", "es"). Exclure toute autre langue.
 - Répondre strictement en JSON valide au format suivant :  
 
           

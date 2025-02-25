@@ -391,13 +391,13 @@ const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 2000,  // Limite la réponse à 2000 tokens (ajuste si nécessaire)
+        max_tokens: 12000,  // Limite la réponse à 12000 tokens (ajuste si nécessaire)
   temperature: 1.0, // 🔥 Encourage la diversité des réponses
             refresh: true,
 search: true,
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Donne-moi uniquement les articles de presse et blogs publiés le 18/12/2025 sur les sujets suivants : 
+            { role: "user", content: `Donne-moi uniquement les articles de presse et blogs publiés entre le 1/2/2025 et le 22/2/2025 sur les sujets suivants : 
 - Industrie 4.0 en France  
 - Applications industrielles  
 - IoT industriel
@@ -437,7 +437,7 @@ Instructions importantes :
             }
 
        
-            - Limiter les réponses à 10 articles.` }
+            - Donnes impérativement 10 articles.` }
         ]
     },
             {
@@ -453,12 +453,19 @@ Instructions importantes :
     if (!response.data || !response.data.choices) {
       throw new Error("Réponse invalide de Perplexity AI");
     }
+const rawContent = response.data.choices[0].message.content;
+console.log("🔍 Contenu brut de la réponse Perplexity :", rawContent);
+if (!rawContent.trim().startsWith("{")) {
+    console.error("❌ La réponse Perplexity n'est pas du JSON !");
+    return [];
+}
 
     const parsedResponse = JSON.parse(response.data.choices[0].message.content);
 
     console.log("📥 Articles récupérés depuis Perplexity :", parsedResponse.articles);
-    console.log("🔍 Réponse brute de Perplexity :", response.data);
-const rawContent = response.data.choices[0].message.content;
+ console.log("🔍 Réponse brute complète :", JSON.stringify(response.data, null, 2));
+console.dir(response.data, { depth: null, colors: true });
+
 console.log("RAW message content:", rawContent);
 
 

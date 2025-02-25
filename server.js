@@ -20,6 +20,9 @@ const GOOGLE_SEARCH_CX = process.env.GOOGLE_SEARCH_CX;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
+app.use(express.json());  
+app.use(express.urlencoded({ extended: true })); 
+
 // Configuration CORS
 app.use(cors({ origin: "*" }));
 app.use((req, res, next) => {
@@ -424,7 +427,7 @@ const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 3000,  // Limite la réponse à 12000 tokens (ajuste si nécessaire)
+        max_tokens: 3000,  // Limite la réponse à 3000 tokens (ajuste si nécessaire)
   temperature: 0.7, // 🔥 Encourage la diversité des réponses
 top_p: 0.9,
         messages: [
@@ -444,18 +447,21 @@ top_p: 0.9,
 - Salons et événements industriels en cours ou à venir  
 - Nominations de nouveaux dirigeants  
 
-📌 Instructions importantes :  
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.
 - Retourner uniquement les articles publiés le ${dateRangeText}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).
 - Exclure les articles dont l’URL est parmi ces valeurs :
             ${[...seenArticles].map(url => `- ${url}`).join("\n")}
 - Rechercher jusqu'à 10 articles.
-- Si 10 articles pertinents ne sont pas trouvés, élargir légèrement la recherche aux sujets connexes pour compléter la liste.
+- Prioriser les sources diverses et les articles les plus récents, même s'ils sont moins connus ou moins fiables.
+- Ne retourner que des articles en anglais, français, allemand ou espagnol ("en", "fr", "de", "es"). Exclure toute autre langue.
+- Si moins de 10 articles pertinents sont trouvés, élargir légèrement la recherche aux sujets connexes tout en restant dans les langues spécifiées pour compléter la liste.
+- Essayez de fournir un mélange équilibré d'articles dans les différentes langues autorisées.
 - Prioriser les articles correspondant strictement aux sujets demandés avant d’élargir la recherche.
 - Incluez une diversité maximale dans les sujets abordés, sans répétition.  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Ne retourner que des articles en anglais, français, allemand ou espagnol ("en", "fr", "de", "es"). Exclure toute autre langue.
 - Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
 - Répondre strictement en JSON valide au format suivant :  
 

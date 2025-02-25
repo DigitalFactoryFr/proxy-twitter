@@ -375,16 +375,24 @@ async function fetchLatestNews() {
   }
 
   try {
-const now = new Date();
-const currentHour = now.getHours();
-// On prend deux heures de moins
-let blockStart = currentHour - 2; 
+const now = new Date(); // Obtenir la date actuelle
+const currentHour = now.getHours(); // Heure actuelle
+const day = now.getDate(); // Jour du mois
+const month = now.getMonth() + 1; // Mois (en JavaScript, le mois commence à 0)
+const year = now.getFullYear(); // Année
 
+// Format de la date sous forme de "JJ/MM/AAAA"
+const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+
+// Plage horaire
+let blockStart = currentHour - 2;
 if (blockStart < 0) {
-  blockStart = 0; // ou blockStart += 24 si vous voulez une boucle sur 24h
+  blockStart = 0; // Gérer les heures négatives si nécessaire
 }
 
-const dateRangeText = `aujourd'hui entre ${blockStart}h et ${currentHour}h`;
+// Créer le texte de la plage horaire
+const dateRangeText = `${formattedDate} entre ${blockStart}h et ${currentHour}h`;
+
 
 console.log(dateRangeText);
 const response = await axios.post(
@@ -397,7 +405,7 @@ const response = await axios.post(
 search: true,
         messages: [
             { role: "system", content: "Fournissez des réponses structurées et concises." },
-            { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement ${dateRangeText}, sur les sujets suivants :  
+            { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement le ${dateRangeText}, sur les sujets suivants :  
 - Industrie 4.0  
 - Applications industrielles
 - SaaS industrielle  
@@ -413,14 +421,11 @@ search: true,
 - Nominations de nouveaux dirigeants  
 
 📌 Instructions importantes :  
-- Retourner uniquement les articles publiés ${dateRangeText}.  
+- Retourner uniquement les articles publiés le ${dateRangeText}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Rechercher d'abord des articles en français ("fr").
-- Si moins de 10 articles sont trouvés en français, compléter avec des articles en anglais ("en").
-- Si toujours insuffisant, ajouter des articles en espagnol ("es"), puis en allemand ("de").
-- Le champ "language" doit toujours être en minuscule (ex. : "en", "fr", de, es).  
+
 - Ne retourner que des articles en anglais, français, allemand ou espagnol ("en", "fr", "de", "es"). Exclure toute autre langue.
 - Répondre strictement en JSON valide au format suivant :  
 

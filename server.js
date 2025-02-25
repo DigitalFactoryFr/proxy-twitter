@@ -376,7 +376,17 @@ async function fetchLatestNews() {
 
   try {
 const now = new Date();
-const pastHour = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();   
+const currentHour = now.getHours();
+// On prend deux heures de moins
+let blockStart = currentHour - 2; 
+
+if (blockStart < 0) {
+  blockStart = 0; // ou blockStart += 24 si vous voulez une boucle sur 24h
+}
+
+const dateRangeText = `aujourd'hui entre ${blockStart}h et ${currentHour}h`;
+
+console.log(dateRangeText);
 const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
@@ -387,7 +397,7 @@ const response = await axios.post(
 search: true,
         messages: [
             { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Donne-moi uniquement les derniers articles de presse et blogs publiés aujourd’hui après ${pastHour} sur les sujets suivants : 
+            { role: "user", content: `Donne-moi uniquement les derniers articles de presse et blogs publiés ${dateRangeText} sur les sujets suivants : 
 - Industrie 4.0 en France  
 - Applications industrielles  
 - IoT industriel
@@ -402,7 +412,7 @@ search: true,
 - Nouvelles nominations 
 
 Instructions importantes :  
-- Retourne des articles publiés après ${pastHour}.  
+- Retourne des articles publiés uniquement ${dateRangeText}.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
 - Ne renvoie que des articles uniques (aucun doublon).
 - Liste dans "companies" toutes les entreprises ou marques mentionnées.

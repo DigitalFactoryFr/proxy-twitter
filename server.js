@@ -412,7 +412,7 @@ search: true,
 - Nouvelles nominations 
 
 Instructions importantes :  
-- Donnes impérativement des articles
+- Donnes impérativement des résultats d'article
 - Retourne des articles publiés uniquement ${dateRangeText}.  
 - N'inclus aucun article plus ancien ou publié en dehors de cette période.  
 - Ne renvoie que des articles uniques (aucun doublon).

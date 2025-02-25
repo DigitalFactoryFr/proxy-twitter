@@ -411,7 +411,7 @@ const year = now.getFullYear(); // Année
 const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
 
 // Plage horaire
-let blockStart = currentHour - 72;
+let blockStart = currentHour - 24;
 if (blockStart < 0) {
   blockStart = 0; // Gérer les heures négatives si nécessaire
 }

@@ -455,7 +455,7 @@ Instructions importantes :
 - Exclure les articles dont l’URL est parmi ces valeurs :
             ${[...seenArticles].map(url => `- ${url}`).join("\n")}
 - Rechercher jusqu'à 10 articles.
-- Prioriser les sources diverses et les articles les plus récents, même s'ils sont moins connus ou moins fiables.
+- Inclure au moins 3 articles en anglais ("en"), 3 articles en français ("fr"), 1 articles en allemand ("de"), et 1 articles en espagnol ("es"), si disponibles.
 - Ne retourner que des articles en anglais, français, allemand ou espagnol ("en", "fr", "de", "es"). Exclure toute autre langue.
 - Si moins de 10 articles pertinents sont trouvés, élargir légèrement la recherche aux sujets connexes tout en restant dans les langues spécifiées pour compléter la liste.
 - Essayez de fournir un mélange équilibré d'articles dans les différentes langues autorisées.

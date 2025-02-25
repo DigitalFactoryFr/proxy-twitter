@@ -378,7 +378,7 @@ async function fetchLatestNews() {
 const now = new Date();
 const currentHour = now.getHours();
 // On prend deux heures de moins
-let blockStart = currentHour - 2; 
+let blockStart = currentHour - 3; 
 
 if (blockStart < 0) {
   blockStart = 0; // ou blockStart += 24 si vous voulez une boucle sur 24h
@@ -517,13 +517,13 @@ async function updateArticles() {
 // 🏁 Appeler la première fois immédiatement
 updateArticles();
 
-// 🔄 Puis répéter toutes les 3 heures
-setInterval(updateArticles, 3 * 60 * 60 * 1000);
+// 🔄 Puis répéter toutes les 2 heures
+setInterval(updateArticles, 2 * 60 * 60 * 1000);
 
 
 
 
-setInterval(updateArticles, 3 * 60 * 60 * 1000); // Actualisation toutes les 3h
+setInterval(updateArticles, 2 * 60 * 60 * 1000); // Actualisation toutes les 2h
 
 
 // 📢 Route API pour récupérer les articles avec filtres généraux

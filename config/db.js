@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Sequelize, DataTypes } = require('sequelize'); // 🔥 Ajout de DataTypes
 
+
 console.log("🔍 Chargement des variables d'environnement :");
 console.log(process.env);
 
@@ -68,7 +69,26 @@ const Article = sequelize.define("Article", {
 });
 
 
+
+const Feedback = sequelize.define("Feedback", {
+    likes: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    dislikes: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    }
+}, {
+    tableName: "feedback",
+    timestamps: false
+});
+
+
+
+
 // 📌 Synchronisation de la base de données
 sequelize.sync();
 
-module.exports = { sequelize, Article };
+module.exports = { sequelize, Article, Feedback };
+

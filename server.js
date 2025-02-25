@@ -7,7 +7,7 @@ const cors = require("cors");
 const cheerio = require('cheerio');
 const fs = require("fs");
 const bodyParser = require("body-parser");
-const { sequelize, Article } = require("./config/db");
+const { sequelize, Article, Feedback } = require("./config/db");
 const { Op } = require("sequelize");
 
 
@@ -302,47 +302,45 @@ app.get("/api/company-info", async (req, res) => {
 
 // Gestion des Feedbacks (Like / Dislike) avec persistance
 
-const feedbackFile = "feedback.json";
-
-// Activer CORS pour éviter les problèmes avec Shopify ou d'autres domaines
-app.use(bodyParser.json()); // Permet de lire les requêtes JSON
-
-// Charger les votes sauvegardés
-let feedback = { likes: 0, dislikes: 0 };
-if (fs.existsSync(feedbackFile)) {
-    try {
-        feedback = JSON.parse(fs.readFileSync(feedbackFile, "utf-8"));
-    } catch (err) {
-        console.error(" Erreur lors du chargement des votes :", err);
-    }
-}
+console.log("📌 Vérification Feedback :", Feedback);
 
 // Route GET : Récupérer les votes
-app.get("/api/feedback", (req, res) => {
-    res.json(feedback);
+app.get("/api/feedback", async (req, res) => {
+    try {
+        const feedback = await Feedback.findOne({ where: { id: 1 } });
+        res.json(feedback || { likes: 0, dislikes: 0 });
+    } catch (error) {
+        console.error("❌ Erreur récupération feedback :", error);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
 });
 
 // Route POST : Mettre à jour les votes
-app.post("/api/feedback", (req, res) => {
-    const { type } = req.body;
+app.post("/api/feedback", async (req, res) => {
+    const { type } = req.body;
+    if (!type || (type !== "like" && type !== "dislike")) {
+        return res.status(400).json({ error: "Type invalide" });
+    }
 
-    if (!type || (type !== "like" && type !== "dislike")) {
-        return res.status(400).json({ error: "Type invalide" });
-    }
+    try {
+        const feedback = await Feedback.findOne({ where: { id: 1 } });
+        if (!feedback) {
+            await Feedback.create({ likes: 0, dislikes: 0 });
+        }
 
-    if (type === "like") feedback.likes++;
-    if (type === "dislike") feedback.dislikes++;
+        if (type === "like") {
+            await Feedback.increment("likes", { where: { id: 1 } });
+        } else if (type === "dislike") {
+            await Feedback.increment("dislikes", { where: { id: 1 } });
+        }
 
-    try {
-        fs.writeFileSync(feedbackFile, JSON.stringify(feedback, null, 2));
-        res.json(feedback);
-    } catch (error) {
-        console.error(" Erreur lors de la sauvegarde :", error);
-        res.status(500).json({ error: "Erreur lors de la sauvegarde" });
-    }
-
+        const updatedFeedback = await Feedback.findOne({ where: { id: 1 } });
+        res.json(updatedFeedback);
+    } catch (error) {
+        console.error("❌ Erreur mise à jour feedback :", error);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
 });
-
 
 
 

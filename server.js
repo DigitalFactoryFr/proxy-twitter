@@ -522,7 +522,13 @@ try {
     return [];
 }
 
+const hasGermanArticle = parsedResponse.articles.some(article => article.language === "de");
 
+        if (hasGermanArticle) {
+            console.log("✅ Un article en allemand est bien récupéré !");
+        } else {
+            console.warn("⚠️ Aucun article en allemand trouvé dans la réponse !");
+        }
 console.log("📥 Articles récupérés depuis Perplexity :", parsedResponse.articles);
 console.log("🔍 Réponse brute complète :", JSON.stringify(response.data, null, 2));
 console.dir(response.data, { depth: null, colors: true });
@@ -544,9 +550,21 @@ async function updateArticles() {
     return;
   }
 
+  console.log("📌 Articles prêts pour l'enregistrement :", articles.map(a => `${a.language}: ${a.title}`).join("\n"));
+
+
+      
+
   for (const article of articles) {
     // Vérifier / compléter l'image si besoin
-    if (!article.image) {
+    
+  console.log(`🔍 Vérification : ${article.title} | Langue: ${article.language}`);
+
+        if (article.language === "de") {
+            console.log("✅ Article en allemand détecté :", article.title);
+        }
+
+if (!article.image) {
       article.image = await fetchArticleImage(article.url); 
     }
 

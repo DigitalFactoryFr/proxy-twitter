@@ -369,17 +369,43 @@ await sequelize.sync(); // 🔄 Assure-toi que les tables sont bien synchronisé
 
 // 🔥 Fonction pour récupérer les actualités depuis Perplexity API
 
+async function getExistingArticles() {
+    try {
+        const { data } = await axios.get("https://digitalfactory.store/pages/actualites");
+        const $ = cheerio.load(data);
+        let existingUrls = [];
+
+        // Sélectionne les URLs des articles (adapte le sélecteur en fonction de la structure de ta page)
+        $("a.article-link").each((i, el) => {
+            existingUrls.push($(el).attr("href"));
+        });
+
+        return new Set(existingUrls); // Convertir en Set pour filtrer facilement
+    } catch (error) {
+        console.error("❌ Impossible de récupérer les articles existants :", error.message);
+        return new Set(); // Retourne un Set vide en cas d'erreur
+    }
+}
+
 async function fetchLatestNews() {
   if (!PERPLEXITY_API_KEY) {
     return { error: "Clé API Perplexity non définie." };
   }
 
   try {
+
+const existingArticles = await Article.findAll({
+    attributes: ['url', 'title']
+});
+const seenArticles = new Set(existingArticles.map(a => a.url));
+
 const now = new Date(); // Obtenir la date actuelle
 const currentHour = now.getHours(); // Heure actuelle
 const day = now.getDate(); // Jour du mois
 const month = now.getMonth() + 1; // Mois (en JavaScript, le mois commence à 0)
 const year = now.getFullYear(); // Année
+
+
 
 // Format de la date sous forme de "JJ/MM/AAAA"
 const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
@@ -395,14 +421,14 @@ const dateRangeText = `${formattedDate} entre ${blockStart}h et ${currentHour}h`
 
 
 console.log(dateRangeText);
+console.log("🔍 Articles déjà affichés :", seenArticles);
 const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
         max_tokens: 3000,  // Limite la réponse à 12000 tokens (ajuste si nécessaire)
-  temperature: 1.0, // 🔥 Encourage la diversité des réponses
-            refresh: true,
-search: true,
+  temperature: 0.7, // 🔥 Encourage la diversité des réponses
+top_p: 0.9,
         messages: [
             { role: "system", content: "Fournissez des réponses structurées et concises." },
             { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement le ${dateRangeText}, sur les sujets suivants :  
@@ -423,9 +449,14 @@ search: true,
 📌 Instructions importantes :  
 - Retourner uniquement les articles publiés le ${dateRangeText}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.
-- Tous les articles doivent être uniques (pas de doublons).  
+- Tous les articles doivent être uniques (pas de doublons).
+- Exclure les articles dont l’URL est parmi ces valeurs :
+            ${[...seenArticles].map(url => `- ${url}`).join("\n")}
+- Rechercher jusqu'à 10 articles.
+- Si 10 articles pertinents ne sont pas trouvés, élargir légèrement la recherche aux sujets connexes pour compléter la liste.
+- Prioriser les articles correspondant strictement aux sujets demandés avant d’élargir la recherche.
+- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-
 - Ne retourner que des articles en anglais, français, allemand ou espagnol ("en", "fr", "de", "es"). Exclure toute autre langue.
 - Répondre strictement en JSON valide au format suivant :  
 

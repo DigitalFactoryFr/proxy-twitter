@@ -427,7 +427,7 @@ const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 3000,  // Limite la réponse à 3000 tokens (ajuste si nécessaire)
+        max_tokens: 12000,  // Limite la réponse à 12000 tokens (ajuste si nécessaire)
   temperature: 0.7, // 🔥 Encourage la diversité des réponses
 top_p: 0.9,
         messages: [
@@ -452,8 +452,6 @@ Instructions importantes :
 - Retourner uniquement les articles publiés le ${dateRangeText}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).
-- Exclure les articles dont l’URL est parmi ces valeurs :
-            ${[...seenArticles].map(url => `- ${url}`).join("\n")}
 - Inclure au moins 3 articles en anglais ("en"), 3 articles en français ("fr"), 1 articles en allemand ("de"), et 1 articles en espagnol ("es"), si disponibles.
 - Chaque article doit être traité uniquement dans sa langue d'origine.
 - Si moins de 10 articles pertinents sont trouvés, élargir légèrement la recherche aux sujets connexes tout en restant dans les langues spécifiées pour compléter la liste.
@@ -578,7 +576,7 @@ if (!article.image) {
         url:         article.url,
         image:       article.image,
         language:    article.language,
-         tags:        JSON.stringify(article.tags),
+        tags: Array.isArray(article.tags) ? article.tags : [],
         companies:   article.companies,
       },
     });

@@ -412,7 +412,7 @@ const year = now.getFullYear(); // Année
 const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
 
 // Plage horaire
-let blockStart = currentHour - 24;
+let blockStart = currentHour - 3;
 if (blockStart < 0) {
   blockStart = 0; // Gérer les heures négatives si nécessaire
 }
@@ -437,10 +437,11 @@ const response = await axios.post(
 - SaaS industrielles  
 - Iot Industriel
 - Automatisation et transformation digital dans le secteur industrielle
+- industrie 4.0 en France
 
 
 Instructions importantes :  
-- Fournir jusqu'à 20 articles uniques et pertinents.
+- Fournir jusqu'à 10 articles uniques et pertinents.
 - Tous les articles doivent provenir de sources reconnues et avoir une URL valide.
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.

@@ -367,220 +367,287 @@ await sequelize.sync(); // 🔄 Assure-toi que les tables sont bien synchronisé
 
 
 
-
-// 🔥 Fonction pour récupérer les actualités depuis Perplexity API
-
+// 🔥 Fonction pour récupérer les actualités existantes depuis votre page actualités
 async function getExistingArticles() {
-    try {
-        const { data } = await axios.get("https://digitalfactory.store/pages/actualites");
-        const $ = cheerio.load(data);
-        let existingUrls = [];
+  try {
+    const { data } = await axios.get("https://digitalfactory.store/pages/actualites");
+    const $ = cheerio.load(data);
+    let existingUrls = [];
 
-        // Sélectionne les URLs des articles (adapte le sélecteur en fonction de la structure de ta page)
-        $("a.article-link").each((i, el) => {
-            existingUrls.push($(el).attr("href"));
-        });
+    // Sélectionne les URLs des articles (adaptez le sélecteur en fonction de la structure de votre page)
+    $("a.article-link").each((i, el) => {
+      const href = $(el).attr("href");
+      if (href) {
+        const absoluteUrl = new URL(href, "https://digitalfactory.store").toString();
+        existingUrls.push(absoluteUrl);
+      }
+    });
 
-        return new Set(existingUrls); // Convertir en Set pour filtrer facilement
-    } catch (error) {
-        console.error("❌ Impossible de récupérer les articles existants :", error.message);
-        return new Set(); // Retourne un Set vide en cas d'erreur
-    }
+    return new Set(existingUrls); // Convertir en Set pour filtrer facilement
+  } catch (error) {
+    console.error("❌ Impossible de récupérer les articles existants :", error.message);
+    return new Set(); // Retourne un Set vide en cas d'erreur
+  }
 }
 
-async function fetchLatestNews() {
+// 🔥 Fonction générique pour envoyer un prompt à Perplexity API
+async function sendPrompt(topicText) {
   if (!PERPLEXITY_API_KEY) {
-    return { error: "Clé API Perplexity non définie." };
+    console.error("❌ Clé API Perplexity non définie.");
+    return [];
   }
 
-  try {
+  // Calcul de la date et de la plage horaire
+  const now = new Date();
+  const currentHour = now.getHours();
+  const day = now.getDate();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+  let blockStart = currentHour - 3;
+  if (blockStart < 0) {
+    blockStart = 0; // Gérer les heures négatives si nécessaire
+  }
+  const dateRangeText = `${formattedDate} entre ${blockStart}h et ${currentHour}h`;
+  console.log(dateRangeText);
 
-const existingArticles = await Article.findAll({
-    attributes: ['url', 'title']
-});
-const seenArticles = new Set(existingArticles.map(a => a.url));
+  // Récupérer les articles déjà en base pour éviter les doublons
+  const existingArticles = await Article.findAll({ attributes: ['url', 'title'] });
+  const seenArticles = new Set(existingArticles.map(a => a.url));
+  console.log("🔍 Articles déjà affichés :", seenArticles);
 
-const now = new Date(); // Obtenir la date actuelle
-const currentHour = now.getHours(); // Heure actuelle
-const day = now.getDate(); // Jour du mois
-const month = now.getMonth() + 1; // Mois (en JavaScript, le mois commence à 0)
-const year = now.getFullYear(); // Année
-
-
-
-// Format de la date sous forme de "JJ/MM/AAAA"
-const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-
-// Plage horaire
-let blockStart = currentHour - 3;
-if (blockStart < 0) {
-  blockStart = 0; // Gérer les heures négatives si nécessaire
-}
-
-// Créer le texte de la plage horaire
-const dateRangeText = `${formattedDate} entre ${blockStart}h et ${currentHour}h`;
+  // Texte complet du prompt (stocké dans une constante) en y intégrant la date
+  const prompt = `${topicText}
 
 
-console.log(dateRangeText);
-console.log("🔍 Articles déjà affichés :", seenArticles);
-const response = await axios.post(
-      "https://api.perplexity.ai/chat/completions",
-    {
-        model: "sonar-pro",
-        max_tokens: 3000,  // Limite la réponse à 3000 tokens (ajuste si nécessaire)
-
-        messages: [
-            { role: "system", content: "Fournissez des réponses structurées et concises." },
-            { role: "user", content: `Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
-
-
-- Salons et événements industriels en cours ou à venir
-- Nominations de nouveaux dirigeants
-
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.
-- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.
-- Retourner uniquement les articles publiés le ${formattedDate}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.
-- Tous les articles doivent être uniques (pas de doublons).
-- Chaque article doit être traité uniquement dans sa langue d'origine.
-- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.
-- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
-- Répondre strictement en JSON valide au format suivant :  
-
-          
-            {
-              "articles": [
-                {
-     "title": "...",
+{
+  "articles": [
+    {
+      "title": "...",
       "description": "...",
       "image": "URL de l'image",
       "tags": ["...", "..."],
       "date": "YYYY-MM-DD HH:mm:ss",
       "source": "...",
       "url": "...",
-      "language": "...", 
-	"companies": ["...","..."]
+      "language": "...",
+      "companies": ["...", "..."]
     }
-              ]
-            }
+  ]
+}`;
 
-       
-            ` }
-        ]
-    },
-            {
-                headers: {
-                    "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                }
-            }
-        );
+  console.log("✉️ Envoi du prompt :", prompt);
 
+  try {
+    const response = await axios.post(
+      "https://api.perplexity.ai/chat/completions",
+      {
+        model: "sonar-pro",
+        max_tokens: 3000,
+        messages: [
+          { role: "system", content: "Fournissez des réponses structurées et concises." },
+          { role: "user", content: prompt }
+        ]
+      },
+      {
+        headers: {
+          "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        }
+      }
+    );
 
     if (!response.data || !response.data.choices) {
       throw new Error("Réponse invalide de Perplexity AI");
     }
-const rawContent = response.data.choices[0].message.content;
-console.log("🔍 Contenu brut de la réponse Perplexity :", rawContent);
 
-let parsedResponse;
-try {
-    // Trouver la position du premier { pour extraire uniquement le JSON
-    const jsonStart = rawContent.indexOf("{");
-    if (jsonStart === -1) {
+    const rawContent = response.data.choices[0].message.content;
+    console.log("🔍 Contenu brut de la réponse Perplexity :", rawContent);
+
+    let parsedResponse;
+    try {
+      // Extraire le JSON à partir du premier '{'
+      const jsonStart = rawContent.indexOf("{");
+      if (jsonStart === -1) {
         throw new Error("Aucun JSON détecté dans la réponse !");
-    }
+      }
+      const jsonString = rawContent.slice(jsonStart);
+      parsedResponse = JSON.parse(jsonString);
 
-    const jsonString = rawContent.slice(jsonStart); // On prend tout à partir du premier '{'
-
-    parsedResponse = JSON.parse(jsonString);
-
-    if (!parsedResponse.articles || !Array.isArray(parsedResponse.articles)) {
+      if (!parsedResponse.articles || !Array.isArray(parsedResponse.articles)) {
         throw new Error("Le champ 'articles' est manquant ou mal formaté !");
+      }
+    } catch (error) {
+      console.error("❌ La réponse Perplexity n'est pas un JSON valide :", error.message);
+      return [];
     }
-} catch (error) {
-    console.error("❌ La réponse Perplexity n'est pas un JSON valide :", error.message);
-    return [];
-}
 
-const hasGermanArticle = parsedResponse.articles.some(article => article.language === "de");
+    const hasGermanArticle = parsedResponse.articles.some(article => article.language === "de");
+    if (hasGermanArticle) {
+      console.log("✅ Un article en allemand est bien récupéré !");
+    } else {
+      console.warn("⚠️ Aucun article en allemand trouvé dans la réponse !");
+    }
 
-        if (hasGermanArticle) {
-            console.log("✅ Un article en allemand est bien récupéré !");
-        } else {
-            console.warn("⚠️ Aucun article en allemand trouvé dans la réponse !");
-        }
-console.log("📥 Articles récupérés depuis Perplexity :", parsedResponse.articles);
-console.log("🔍 Réponse brute complète :", JSON.stringify(response.data, null, 2));
-console.dir(response.data, { depth: null, colors: true });
+    console.log("📥 Articles récupérés depuis Perplexity :", parsedResponse.articles);
+    console.log("🔍 Réponse brute complète :", JSON.stringify(response.data, null, 2));
+    console.dir(response.data, { depth: null, colors: true });
 
-return parsedResponse.articles || [];
-} catch (error) {
+    return parsedResponse.articles || [];
+  } catch (error) {
     console.error("❌ Erreur API Perplexity :", error.message);
     return [];
-}
-}
-
-// 🔄 Mise à jour automatique des articles
-
-
-async function updateArticles() {
-  const articles = await fetchLatestNews(); // <--- votre fonction qui appelle Perplexity
-  if (!articles.length) {
-    console.log("🛑 Perplexity n'a renvoyé aucun article.");
-    return;
   }
+}
 
-  console.log("📌 Articles prêts pour l'enregistrement :", articles.map(a => `${a.language}: ${a.title}`).join("\n"));
+// Exemple de fonction pour récupérer une image (à adapter selon vos besoins)
+async function fetchArticleImage(url) {
+  // Implémentez ici la logique pour récupérer une image à partir de l'URL de l'article
+  return "https://exemple.com/default-image.jpg";
+}
+
+// 🔄 Fonction qui enchaîne plusieurs prompts séquentiellement
+async function executeNewsPrompts() {
+   // Calcul de la date et de la plage horaire
+  const now = new Date();
+  const currentHour = now.getHours();
+  const day = now.getDate();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+  let blockStart = currentHour - 3;
+  if (blockStart < 0) {
+    blockStart = 0; // Gérer les heures négatives si nécessaire
+  }
+  const dateRangeText = `${formattedDate} entre ${blockStart}h et ${currentHour}h`;
+  console.log(dateRangeText);
 
 
-      
+  // Définition des sujets pour chaque prompt
+  const prompts = [
+    // 1er prompt : Actualités Industrie 4.0 et sujets associés
+    `
+Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
+- Industrie 4.0
+- Applications industrielles
+- SaaS industrielle
+- IoT industriel
+- Logiciels industriels
+- Startups industrielles
+- Automatisation et digitalisation dans l'industrie
+- Levées de fonds industrielles
+- Fusions et acquisitions dans le secteur industriel
+- Lancements de nouveaux produits industriels
+- Partenariats stratégiques entre entreprises industrielles
+- Salons et événements industriels en cours ou à venir
+- Nominations de nouveaux dirigeants
 
-  for (const article of articles) {
-    // Vérifier / compléter l'image si besoin
-    
-  console.log(`🔍 Vérification : ${article.title} | Langue: ${article.language}`);
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.  
+- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
+- Répondre strictement en JSON valide au format suivant :  
+`,
 
-        if (article.language === "de") {
-            console.log("✅ Article en allemand détecté :", article.title);
-        }
+    // 2ème prompt : Levées de fonds/acquisitions dans les startups industrielles, événements et salons à venir
+    `Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
 
-if (!article.image) {
-      article.image = await fetchArticleImage(article.url); 
+- Levées de fonds industrielles
+- Fusions et acquisitions dans le secteur industriel
+- Lancements de nouveaux produits industriels
+- Partenariats stratégiques entre entreprises industrielles
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.  
+- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
+- Répondre strictement en JSON valide au format suivant : `,
+
+    // 3ème prompt : Actualités SaaS industriel, logiciels industriels, nouvelles statuts et nouveaux projets industriels
+    `Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
+
+- Salons et événements industriels en cours ou à venir
+- Nominations de nouveaux dirigeants
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.  
+- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
+- Répondre strictement en JSON valide au format suivant :  `
+  ];
+
+  // Parcourir chaque prompt et traiter la réponse avant de passer au suivant
+  for (let i = 0; i < prompts.length; i++) {
+    console.log(`\n=== Exécution du prompt ${i + 1} ===`);
+    const articles = await sendPrompt(prompts[i]);
+    console.log(`📥 Articles récupérés pour le prompt ${i + 1} :`, articles);
+
+    for (const article of articles) {
+      console.log(`🔍 Vérification : ${article.title} | Langue: ${article.language}`);
+
+      if (article.language === "de") {
+        console.log("✅ Article en allemand détecté :", article.title);
+      }
+
+      if (!article.image) {
+        article.image = await fetchArticleImage(article.url);
+      }
+
+      // Sauvegarde en base de données (utilisez findOrCreate ou upsert selon votre logique)
+      await Article.findOrCreate({
+        where: { url: article.url },
+        defaults: {
+          title: article.title,
+          description: article.description,
+          source: article.source,
+          date: article.date,
+          url: article.url,
+          image: article.image,
+          language: article.language,
+          tags: Array.isArray(article.tags) ? article.tags : [],
+          companies: article.companies,
+        },
+      });
     }
-
-    // Sauvegarder en base
-    // => findOrCreate ou upsert, selon votre logique
-    await Article.findOrCreate({
-      where: { url: article.url },
-      defaults: {
-        title:       article.title,
-        description: article.description,
-        source:      article.source,
-        date:        article.date,
-        url:         article.url,
-        image:       article.image,
-        language:    article.language,
-        tags: Array.isArray(article.tags) ? article.tags : [],
-        companies:   article.companies,
-      },
-    });
   }
-
-
-
-    console.log("✅ Articles mis à jour !");
-
+  console.log("✅ Tous les prompts ont été exécutés et les articles mis à jour !");
   const count = await Article.count();
   console.log("📊 Nombre total d'articles enregistrés en base :", count);
 }
 
+// Lancement de la séquence des prompts
+executeNewsPrompts();
 
+async function updateArticles() {
+  console.log("🔄 Mise à jour des articles en cours...");
 
+  // Exécuter la récupération des articles
+  await executeNewsPrompts();
+
+  console.log("✅ Mise à jour des articles terminée !");
+}
 
 
 // 🏁 Appeler la première fois immédiatement

@@ -427,7 +427,7 @@ const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
     {
         model: "sonar-pro",
-        max_tokens: 12000,  // Limite la réponse à 12000 tokens (ajuste si nécessaire)
+        max_tokens: 3000,  // Limite la réponse à 3000 tokens (ajuste si nécessaire)
   temperature: 0.7, // 🔥 Encourage la diversité des réponses
 top_p: 0.9,
         messages: [

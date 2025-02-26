@@ -433,14 +433,19 @@ const response = await axios.post(
             { role: "system", content: "Fournissez des réponses structurées et concises." },
             { role: "user", content: `Récupérez les articles de presse et articles de blog publiés uniquement le ${formattedDate}, sur les sujets suivants :  
 
- 
-- SaaS industriels
+- Industrie 4.0
+- Applications industrielles
+- SaaS industrielle
 - IoT industriel
-- Automatisation et transformation digitale dans le secteur industriel
-- Industrie 4.0 en France
-- Levée de fonds pour les startups industrielles
-- Acquisition et achat d'entreprises industrielles
-- Nouvelles nominations au sein des grands groupes industriels
+- Logiciels industriels
+- Startups industrielles
+- Automatisation et digitalisation dans l'industrie
+- Levées de fonds industrielles
+- Fusions et acquisitions dans le secteur industriel
+- Lancements de nouveaux produits industriels
+- Partenariats stratégiques entre entreprises industrielles
+- Salons et événements industriels en cours ou à venir
+- Nominations de nouveaux dirigeants
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.

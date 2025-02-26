@@ -434,8 +434,9 @@ const response = await axios.post(
             { role: "user", content: `Récupérez les articles de presse et articles de blog publiés uniquement en mois de Février 2025, sur les sujets suivants :  
 
  
-- Levées de fonds industrielles  
-- Fusions et acquisitions dans le secteur industriel  
+- SaaS industrielles  
+- Iot Industriel
+- Automatisation et transformation digital dans le secteur industrielle
 
 
 Instructions importantes :  

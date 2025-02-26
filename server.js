@@ -602,7 +602,7 @@ Instructions importantes :
 
 // 4ème prompt
 `Récupérez les articles de presse et articles de blog publiés cette semaine, sur les sujets suivants :  
-- Événements majeurs dans le secteur industriel, salons, lancement nouvelles usines, projets infustriels majeurs, innovations, ect.
+- Événements majeurs dans le secteur industriel, salons, consutruction nouvelles usines, projets infustriels majeurs, innovations, investissement important, ect.
 
 Instructions importantes :  
 - Fournir jusqu'à 15 articles uniques et pertinents.  

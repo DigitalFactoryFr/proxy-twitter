@@ -607,7 +607,7 @@ Instructions importantes :
 Instructions importantes :  
 - Fournir jusqu'à 15 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
-- Retourner uniquement les articles publiés cette semaine (du ${startDate} au ${endDate}).  
+- Retourner uniquement les articles publiés cette semaine.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  

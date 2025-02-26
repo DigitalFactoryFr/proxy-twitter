@@ -431,7 +431,7 @@ const response = await axios.post(
 
         messages: [
             { role: "system", content: "Fournissez des réponses structurées et concises." },
-            { role: "user", content: `Récupérez les articles de presse et articles de blog publiés uniquement en mois de Février 2025, sur les sujets suivants :  
+            { role: "user", content: `Récupérez les articles de presse et articles de blog publiés uniquement le ${formattedDate}, sur les sujets suivants :  
 
  
 - SaaS industrielles  
@@ -442,7 +442,7 @@ const response = await axios.post(
 Instructions importantes :  
 - Fournir jusqu'à 20 articles uniques et pertinents.
 - Tous les articles doivent provenir de sources reconnues et avoir une URL valide.
-- Retourner uniquement les articles publiés en mois de Février 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).
 - Chaque article doit être traité uniquement dans sa langue d'origine.

@@ -431,19 +431,9 @@ const response = await axios.post(
 
         messages: [
             { role: "system", content: "Fournissez des réponses structurées et concises." },
-            { role: "user", content: `Récupérez les articles de presse et articles de blog publiés uniquement le ${formattedDate}, sur les sujets suivants :  
+            { role: "user", content: `Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
 
-- Industrie 4.0
-- Applications industrielles
-- SaaS industrielle
-- IoT industriel
-- Logiciels industriels
-- Startups industrielles
-- Automatisation et digitalisation dans l'industrie
-- Levées de fonds industrielles
-- Fusions et acquisitions dans le secteur industriel
-- Lancements de nouveaux produits industriels
-- Partenariats stratégiques entre entreprises industrielles
+
 - Salons et événements industriels en cours ou à venir
 - Nominations de nouveaux dirigeants
 

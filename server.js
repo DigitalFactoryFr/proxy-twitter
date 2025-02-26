@@ -428,11 +428,10 @@ const response = await axios.post(
     {
         model: "sonar-pro",
         max_tokens: 3000,  // Limite la réponse à 3000 tokens (ajuste si nécessaire)
-  temperature: 0.5, // 🔥 Encourage la diversité des réponses
-top_p: 0.7,
+
         messages: [
             { role: "system", content: "Fournissez des réponses structurées et concises." },
-            { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement le ${dateRangeText}, sur les sujets suivants :  
+            { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement aujourd'hui, sur les sujets suivants :  
 - Industrie 4.0  
 - Applications industrielles
 - SaaS industrielle  
@@ -450,10 +449,9 @@ top_p: 0.7,
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.
 - Tous les articles doivent provenir de sources reconnues et avoir une URL valide.
-- Retourner uniquement les articles publiés le ${dateRangeText}.  
+- Retourner uniquement les articles publiés aujourd'hui.  
 - Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).
-- Inclure au moins 3 articles en anglais ("en"), 3 articles en français ("fr"), 1 articles en allemand ("de"), et 1 articles en espagnol ("es"), si disponibles.
 - Chaque article doit être traité uniquement dans sa langue d'origine.
 - Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.
 - Incluez une diversité maximale dans les sujets abordés, sans répétition.  

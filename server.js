@@ -598,6 +598,31 @@ Instructions importantes :
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
 - Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
 - Répondre strictement en JSON valide au format suivant :  `
+
+
+// 4ème prompt
+'Récupérez les articles de presse et articles de blog publiés cette semaine (du ${startDate} au ${endDate}), sur les sujets suivants :  
+- Événements majeurs dans l'industrie : salons, conférences, lancements de produits, etc.
+- Innovations technologiques : Intelligence Artificielle (IA), Internet des Objets (IoT), blockchain, 5G, etc.
+- Développements sectoriels : automobile, aérospatial, pharmaceutique, énergie, agroalimentaire, etc.
+- Développement durable : énergies renouvelables, économie circulaire, réduction des émissions de CO2, etc.
+- Startups et levées de fonds : startups industrielles, partenariats stratégiques, etc.
+- Nominations et changements de direction : nouveaux dirigeants dans les entreprises industrielles.
+
+Instructions importantes :  
+- Fournir jusqu'à 15 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
+- Retourner uniquement les articles publiés cette semaine (du ${startDate} au ${endDate}).  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.  
+- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
+- Répondre strictement en JSON valide au format suivant : '
+
+
   ];
 
   // Parcourir chaque prompt et traiter la réponse avant de passer au suivant

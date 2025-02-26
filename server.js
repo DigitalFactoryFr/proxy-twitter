@@ -431,7 +431,7 @@ const response = await axios.post(
 
         messages: [
             { role: "system", content: "Fournissez des réponses structurées et concises." },
-            { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement hier, sur les sujets suivants :  
+            { role: "user", content: `Récupérez les articles de presse et articles de blog publiés uniquement ce mois-ci, sur les sujets suivants :  
 - Industrie 4.0  
 - Applications industrielles
 - SaaS industrielle  
@@ -447,9 +447,9 @@ const response = await axios.post(
 - Nominations de nouveaux dirigeants  
 
 Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.
+- Fournir jusqu'à 20 articles uniques et pertinents.
 - Tous les articles doivent provenir de sources reconnues et avoir une URL valide.
-- Retourner uniquement les articles publiés hier.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).
 - Chaque article doit être traité uniquement dans sa langue d'origine.

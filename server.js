@@ -432,8 +432,11 @@ const response = await axios.post(
         messages: [
             { role: "system", content: "Fournissez des réponses structurées et concises." },
             { role: "user", content: `Récupérez les articles de presse et articles de blog publiés uniquement ce mois-ci, sur les sujets suivants :  
- 
-- Nominations de nouveaux dirigeants dans le secteur industriel
+
+- Automatisation et digitalisation dans l'industrie  
+- Levées de fonds industrielles  
+- Fusions et acquisitions dans le secteur industriel  
+
 
 Instructions importantes :  
 - Fournir jusqu'à 20 articles uniques et pertinents.

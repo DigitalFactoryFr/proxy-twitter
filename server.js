@@ -601,13 +601,8 @@ Instructions importantes :
 
 
 // 4ème prompt
-'Récupérez les articles de presse et articles de blog publiés cette semaine (du ${startDate} au ${endDate}), sur les sujets suivants :  
-- Événements majeurs dans l'industrie : salons, conférences, lancements de produits, etc.
-- Innovations technologiques : Intelligence Artificielle (IA), Internet des Objets (IoT), blockchain, 5G, etc.
-- Développements sectoriels : automobile, aérospatial, pharmaceutique, énergie, agroalimentaire, etc.
-- Développement durable : énergies renouvelables, économie circulaire, réduction des émissions de CO2, etc.
-- Startups et levées de fonds : startups industrielles, partenariats stratégiques, etc.
-- Nominations et changements de direction : nouveaux dirigeants dans les entreprises industrielles.
+'Récupérez les articles de presse et articles de blog publiés cette semaine, sur les sujets suivants :  
+- Événements majeurs dans le secteur industriel, salons, lancement nouvelles usines, projets infustriels majeurs, innovations, ect.
 
 Instructions importantes :  
 - Fournir jusqu'à 15 articles uniques et pertinents.  

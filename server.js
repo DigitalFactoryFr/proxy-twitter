@@ -536,12 +536,6 @@ Récupérez les articles de presse et articles de blog publiés le ${formattedDa
 - Logiciels industriels
 - Startups industrielles
 - Automatisation et digitalisation dans l'industrie
-- Levées de fonds industrielles
-- Fusions et acquisitions dans le secteur industriel
-- Lancements de nouveaux produits industriels
-- Partenariats stratégiques entre entreprises industrielles
-- Salons et événements industriels en cours ou à venir
-- Nominations de nouveaux dirigeants
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
@@ -563,7 +557,11 @@ Instructions importantes :
 - Levées de fonds industrielles
 - Fusions et acquisitions dans le secteur industriel
 - Lancements de nouveaux produits industriels
+- Lancement de nouvelles applications ou logiciels industriels
 - Partenariats stratégiques entre entreprises industrielles
+- Startups industrielles : Levées de fonds, innovations, etc.
+- Innovations disruptives : Technologies révolutionnaires, nouveaux business models, etc.
+- Partenariats stratégiques : Collaborations entre startups et grands groupes industriels.
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
@@ -578,11 +576,15 @@ Instructions importantes :
 - Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
 - Répondre strictement en JSON valide au format suivant : `,
 
-    // 3ème prompt : Actualités SaaS industriel, logiciels industriels, nouvelles statuts et nouveaux projets industriels
-    `Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
+    // 3ème prompt     
 
-- Salons et événements industriels en cours ou à venir
-- Nominations de nouveaux dirigeants dans le secteur de l'industrie
+`Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
+
+- Salons industriels (ex: Hannover Messe, CES, etc.)
+- Conférences majeures (ex: Web Summit, VivaTech, etc.)
+- Lancements de produits industriels
+- Événements sectoriels (automobile, aérospatial, etc.)
+- Nominations de nouveaux dirigeants dans le secteur industriel
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  

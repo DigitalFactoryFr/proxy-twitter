@@ -449,12 +449,12 @@ top_p: 0.9,
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.
+- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.
 - Retourner uniquement les articles publiés le ${dateRangeText}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.
 - Tous les articles doivent être uniques (pas de doublons).
 - Inclure au moins 3 articles en anglais ("en"), 3 articles en français ("fr"), 1 articles en allemand ("de"), et 1 articles en espagnol ("es"), si disponibles.
 - Chaque article doit être traité uniquement dans sa langue d'origine.
-- Si moins de 10 articles pertinents sont trouvés, élargir légèrement la recherche aux sujets connexes tout en restant dans les langues spécifiées pour compléter la liste.
 - Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.
 - Incluez une diversité maximale dans les sujets abordés, sans répétition.  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  

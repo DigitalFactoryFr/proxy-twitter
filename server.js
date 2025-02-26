@@ -597,7 +597,7 @@ Instructions importantes :
 - Incluez une diversité maximale dans les sujets abordés, sans répétition.  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
 - Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
-- Répondre strictement en JSON valide au format suivant :  `
+- Répondre strictement en JSON valide au format suivant :  `,
 
 
 // 4ème prompt
@@ -615,7 +615,7 @@ Instructions importantes :
 - Incluez une diversité maximale dans les sujets abordés, sans répétition.  
 - Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
 - Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
-- Répondre strictement en JSON valide au format suivant : `
+- Répondre strictement en JSON valide au format suivant : `,
 
 
   ];

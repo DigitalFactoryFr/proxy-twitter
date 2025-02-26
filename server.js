@@ -428,8 +428,8 @@ const response = await axios.post(
     {
         model: "sonar-pro",
         max_tokens: 3000,  // Limite la réponse à 3000 tokens (ajuste si nécessaire)
-  temperature: 0.7, // 🔥 Encourage la diversité des réponses
-top_p: 0.9,
+  temperature: 0.5, // 🔥 Encourage la diversité des réponses
+top_p: 0.7,
         messages: [
             { role: "system", content: "Fournissez des réponses structurées et concises." },
             { role: "user", content: `Récupérez jusqu'à 10 articles de presse et articles de blog publiés uniquement le ${dateRangeText}, sur les sujets suivants :  

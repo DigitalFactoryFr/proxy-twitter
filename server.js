@@ -594,74 +594,60 @@ setInterval(updateArticles, 15 * 60 * 1000); // Actualisation toutes les 15 minu
 
 
 // 📢 Route API pour récupérer les articles avec filtres généraux
-app.get("/api/articles", async (req, res) => {
+
+app.get("/api/articles/shopify", async (req, res) => {
   try {
+    // On récupère shopifyLang et autres filtres
     const {
-      category,   // ex: ?category=IoT
-      tag,        // ex: ?tag=Innovation
-      language,   // ex: ?language=fr
-      source,     // ex: ?source=Le+Monde
-      company,    // ex: ?company=Bosch
-      dateRange,  // 'today' | 'this_week' | 'this_month' | 'this_year' | 'custom'
+      shopifyLang,
+      tag,
+      source,
+      company,
+      search,
+      dateRange,
       startDate,
-      endDate,
+      endDate
     } = req.query;
 
-    let whereClause = {};
+    // Langue par défaut = "en" si non spécifié
+    const language = shopifyLang || "en";
 
-    // 1. Filtres par tags
-    if (category) {
-      whereClause.tags = { [Op.contains]: [category] };
-    }
+    // whereClause impose la langue
+    let whereClause = { language };
+
+    // 1) Filtre par tag exact
     if (tag) {
       whereClause.tags = { [Op.contains]: [tag] };
-
-
     }
 
-    // 2. Filtre par language si présent
-    if (language) {
-      whereClause.language = language;
-    }
-
-    // 3. Filtre par source (partiel, insensible à la casse)
+    // 2) Filtre par source (partiel, insensible à la casse)
     if (source) {
       whereClause.source = { [Op.iLike]: `%${source}%` };
     }
 
-    // 4. Filtre par company (tableau "companies")
-    //    => On veut un match exact dans le tableau
-    if (company) {
-      whereClause.companies = { [Op.contains]: [company] };
-    }
-
-    // 5. Filtre par période
+    // 3) Gestion des dates (période)
     if (dateRange && dateRange !== "custom") {
       const now = new Date();
       let start = null;
-      let end = new Date(); // fin = maintenant
+      let end = new Date();
 
       switch (dateRange) {
         case "today": {
-          // minuit du jour courant
           start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
           break;
         }
         case "this_week": {
-          // lundi de la semaine courante
-          const dayOfWeek = now.getDay(); // 0=dim, 1=lundi
+          const dayOfWeek = now.getDay(); 
           const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
           start = new Date(now.setDate(diff));
           start.setHours(0, 0, 0, 0);
           break;
         }
         case "this_month": {
-          // 1er jour du mois
           start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
           break;
         }
         case "this_year": {
-          // 1er janvier de l'année
           start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
           break;
         }
@@ -672,25 +658,46 @@ app.get("/api/articles", async (req, res) => {
       }
     }
 
-    // 6. Si dateRange=custom, on prend startDate et endDate
     if (dateRange === "custom" && startDate && endDate) {
       whereClause.date = {
         [Op.between]: [ new Date(startDate), new Date(endDate) ]
       };
     }
 
-    // 7. Requête en base
-    const articles = await Article.findAll({
+    // 4) Requête initiale : on récupère tous les articles correspondant au whereClause
+    let articles = await Article.findAll({
       where: whereClause,
       order: [["date", "DESC"]]
     });
 
+    // 5) 🔎 Recherche partielle par mot-clé (titre, desc, tags)
+    if (search) {
+      const s = search.toLowerCase();
+      articles = articles.filter(a => {
+        const inTitle = a.title?.toLowerCase().includes(s);
+        const inDesc  = a.description?.toLowerCase().includes(s);
+        const inTags  = (a.tags || []).some(tagItem => tagItem.toLowerCase().includes(s));
+        return inTitle || inDesc || inTags;
+      });
+    }
+
+    // 6) 🔎 Recherche partielle par "company" (dans le tableau companies)
+    if (company) {
+      const c = company.toLowerCase();
+      articles = articles.filter(a => {
+        return (a.companies || []).some(comp => comp.toLowerCase().includes(c));
+      });
+    }
+
+    // 7) Retourner la liste finale
     res.json(articles);
+
   } catch (error) {
-    console.error("❌ Erreur récupération articles :", error.message);
+    console.error("❌ Erreur récupération articles Shopify :", error.message);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
 
 
 // 📌 Route API pour récupérer les articles en fonction de la langue de Shopify
@@ -703,6 +710,7 @@ app.get("/api/articles/shopify", async (req, res) => {
       tag,
       source,
       company,
+	search, 
       dateRange,
       startDate,
       endDate
@@ -713,6 +721,17 @@ app.get("/api/articles/shopify", async (req, res) => {
 
     // whereClause impose la langue
     let whereClause = { language };
+
+  // 🔎 1) Recherche partielle par mot-clé (titre, desc, tags)
+    if (search) {
+      const s = search.toLowerCase();
+      articles = articles.filter(a => {
+        const inTitle = a.title?.toLowerCase().includes(s);
+        const inDesc  = a.description?.toLowerCase().includes(s);
+        const inTags  = (a.tags || []).some(tag => tag.toLowerCase().includes(s));
+        return inTitle || inDesc || inTags;
+      });
+    }
 
     // Filtre par tag
     if (tag) {
@@ -726,9 +745,13 @@ app.get("/api/articles/shopify", async (req, res) => {
       whereClause.source = { [Op.iLike]: `%${source}%` };
     }
 
-    // Filtre par companies
+
+      // 🔎 2) Recherche partielle par "company" (tableau)
     if (company) {
-      whereClause.companies = { [Op.contains]: [company] };
+      const c = company.toLowerCase();
+      articles = articles.filter(a => {
+        return (a.companies || []).some(comp => comp.toLowerCase().includes(c));
+      });
     }
 
     // Gestion des dates

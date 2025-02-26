@@ -516,7 +516,7 @@ async function executeNewsPrompts() {
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
   const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-  let blockStart = currentHour - 3;
+  let blockStart = currentHour - 6;
   if (blockStart < 0) {
     blockStart = 0; // Gérer les heures négatives si nécessaire
   }
@@ -618,6 +618,105 @@ Instructions importantes :
 - Répondre strictement en JSON valide au format suivant : `,
 
 
+// 1st Prompt: Industry 4.0 News and Related Topics
+`
+Retrieve press articles and blog posts published on ${formattedDate}, on the following topics:  
+- Industry 4.0  
+- Industrial applications  
+- Industrial SaaS  
+- Industrial IoT  
+- Industrial software  
+- Industrial startups  
+- Automation and digitalization in industry  
+
+Important instructions:  
+- Provide up to 10 unique and relevant articles.  
+- All articles must come from recognized sources and have a valid URL.  
+- Return only articles published on ${formattedDate}.  
+- Exclude articles that do not meet the date criteria.  
+- All articles must be unique (no duplicates).  
+- Each article should be processed only in its original language.  
+- Prioritize the most recent articles strictly related to the requested topics before broadening the search if necessary.  
+- Include maximum diversity in the topics covered, without repetition.  
+- Extract the names of companies mentioned in the articles and list them in the "companies" field.  
+- Generate tags based on the language of the article (e.g., "Automation" in English, "Automatisation" in French).  
+- Respond strictly in valid JSON format as follows:  
+`,
+
+// 2nd Prompt: Fundraising/Acquisitions in Industrial Startups, Upcoming Events, and Trade Shows
+`
+Retrieve press articles and blog posts published on ${formattedDate}, on the following topics:  
+
+- Industrial fundraising  
+- Mergers and acquisitions in the industrial sector  
+- Launches of new industrial products  
+- Launches of new industrial applications or software  
+- Strategic partnerships between industrial companies  
+- Industrial startups: Fundraising, innovations, etc.  
+- Disruptive innovations: Revolutionary technologies, new business models, etc.  
+- Strategic partnerships: Collaborations between startups and large industrial groups.  
+
+Important instructions:  
+- Provide up to 10 unique and relevant articles.  
+- All articles must come from recognized sources and have a valid URL.  
+- Return only articles published on ${formattedDate}.  
+- Exclude articles that do not meet the date criteria.  
+- All articles must be unique (no duplicates).  
+- Each article should be processed only in its original language.  
+- Prioritize the most recent articles strictly related to the requested topics before broadening the search if necessary.  
+- Include maximum diversity in the topics covered, without repetition.  
+- Extract the names of companies mentioned in the articles and list them in the "companies" field.  
+- Generate tags based on the language of the article (e.g., "Automation" in English, "Automatisation" in French).  
+- Respond strictly in valid JSON format as follows:  
+`,
+
+// 3rd Prompt: Industrial Trade Shows, Conferences, and Product Launches
+`
+Retrieve press articles and blog posts published on ${formattedDate}, on the following topics:  
+
+- Industrial trade shows (e.g., Hannover Messe, CES, etc.)  
+- Major conferences (e.g., Web Summit, VivaTech, etc.)  
+- Industrial product launches  
+- Sector-specific events (automotive, aerospace, etc.)  
+- Appointments of new leaders in the industrial sector  
+
+Important instructions:  
+- Provide up to 10 unique and relevant articles.  
+- All articles must come from recognized sources and have a valid URL.  
+- Return only articles published on ${formattedDate}.  
+- Exclude articles that do not meet the date criteria.  
+- All articles must be unique (no duplicates).  
+- Each article should be processed only in its original language.  
+- Prioritize the most recent articles strictly related to the requested topics before broadening the search if necessary.  
+- Include maximum diversity in the topics covered, without repetition.  
+- Extract the names of companies mentioned in the articles and list them in the "companies" field.  
+- Generate tags based on the language of the article (e.g., "Automation" in English, "Automatisation" in French).  
+- Respond strictly in valid JSON format as follows:  
+`,
+
+// 4th Prompt: Major Events in the Industrial Sector
+`
+Retrieve press articles and blog posts published this week, on the following topics:  
+- Major events in the industrial sector, trade shows, construction of new factories, major industrial projects, innovations, significant investments, etc.  
+
+Important instructions:  
+- Provide up to 15 unique and relevant articles.  
+- All articles must come from recognized sources and have a valid URL.  
+- Return only articles published this week.  
+- Exclude articles that do not meet the date criteria.  
+- All articles must be unique (no duplicates).  
+- Each article should be processed only in its original language.  
+- Prioritize the most recent articles strictly related to the requested topics before broadening the search if necessary.  
+- Include maximum diversity in the topics covered, without repetition.  
+- Extract the names of companies mentioned in the articles and list them in the "companies" field.  
+- Generate tags based on the language of the article (e.g., "Automation" in English, "Automatisation" in French).  
+- Respond strictly in valid JSON format as follows:  
+`,
+
+
+
+
+
   ];
 
   // Parcourir chaque prompt et traiter la réponse avant de passer au suivant
@@ -675,8 +774,8 @@ async function updateArticles() {
 // 🏁 Appeler la première fois immédiatement
 updateArticles();
 
-// 🔄 Puis répéter toutes les 2 heures
-setInterval(updateArticles, 15 * 60 * 1000); // Actualisation toutes les 15 minutes
+// 🔄 Puis répéter toutes les 3 heures
+setInterval(updateArticles, 3 * 60 * 60 * 1000); // Actualisation toutes les 3 heures
 
 
 // 📢 Route API pour récupérer les articles avec filtres généraux

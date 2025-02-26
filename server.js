@@ -582,7 +582,7 @@ Instructions importantes :
     `Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
 
 - Salons et événements industriels en cours ou à venir
-- Nominations de nouveaux dirigeants
+- Nominations de nouveaux dirigeants dans le secteur de l'industrie
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  

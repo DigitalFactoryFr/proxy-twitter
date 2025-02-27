@@ -558,14 +558,19 @@ async function executeNewsPrompts() {
   const prompts = [
     // 1er prompt : Actualités Industrie 4.0 et sujets associés
     `
-Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
+Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les levées de fonds dans le secteur industriel, en précisant :
 
-- Levée de fond dans le secteur industriel, 
-- Levée de fond par les startups qui opère dans le secteur industriel
+
+Le montant investi
+Les investisseurs impliqués
+Les startups ou entreprises concernée
+L’objectif des fonds levés (expansion, innovation, R&D, acquisition, etc.)
+Les tendances de financement dans l’industrie
+Ne retournez que des articles récents (publiés aujourd'hui ou hier).
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  

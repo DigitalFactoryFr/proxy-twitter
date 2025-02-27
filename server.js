@@ -564,178 +564,24 @@ async function executeNewsPrompts() {
 
 // 1st prompt: Industrial Investments and Fundraising
 
-` Retrieve articles published on ${dateRangeText} regarding investments and funding in the industry:
+` 
+Récupérez les actualités les plus marquantes du secteur industriel (articles de presse et articles de blog) publiées le ${dateRangeText}.
 
-Fundraising by industrial startups.
-Startups that raised funds: amounts raised, investors involved, goals.
-Major investments in the industry (factory expansions, new projects).
-Investment funds specialized in the industry and their impact.
-Government grants or financial aids for industrial innovation.
-Important instructions:
 
-Provide up to 10 unique and relevant articles.
-All articles must come from recognized and reliable sources and have a valid URL.
-Only return articles published on ${dateRangeText}.
-Exclude articles that do not meet the date criteria.
-All articles must be unique (no duplicates).
-Each article should be processed in its original language.
-Extract the company names mentioned in the articles and list them in the "companies" field.
-Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
-Respond strictly in valid JSON format as follows:
-`,
 
-// 2nd prompt: Mergers, Acquisitions, and Strategic Alliances
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.  
+- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
+- Répondre strictement en JSON valide au format suivant : 
 
-` Retrieve articles published on ${dateRangeText} about strategic operations in the industry:
-
-Mergers and acquisitions of industrial companies and suppliers.
-Strategic partnerships between companies and industrial startups.
-Acquisitions of SaaS, IoT, or AI solutions by large industrial companies.
-Joint ventures and alliances for industrial innovation.
-Impact of acquisitions on markets and competition.
-Important instructions:
-
-Provide up to 10 unique and relevant articles.
-All articles must come from recognized and reliable sources and have a valid URL.
-Only return articles published on ${dateRangeText}.
-Exclude articles that do not meet the date criteria.
-All articles must be unique (no duplicates).
-Each article should be processed in its original language.
-Extract the company names mentioned in the articles and list them in the "companies" field.
-Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
-Respond strictly in valid JSON format as follows:
-`,
-
-// 3rd prompt: Technological Innovations and Digital Transformation
-
-` Retrieve articles published on ${dateRangeText} about new technologies in the industry:
-
-Launches of new industrial equipment.
-Deployment of software applications for the industry (SaaS, ERP, MES).
-New technologies integrated into production (AI, IoT, robotics).
-Presentation of new materials and advanced manufacturing processes.
-Innovations impacting production lines and logistics.
-Important instructions:
-
-Provide up to 10 unique and relevant articles.
-All articles must come from recognized and reliable sources and have a valid URL.
-Only return articles published on ${dateRangeText}.
-Exclude articles that do not meet the date criteria.
-All articles must be unique (no duplicates).
-Each article should be processed in its original language.
-Extract the company names mentioned in the articles and list them in the "companies" field.
-Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
-Respond strictly in valid JSON format as follows:
-`,
-
-// 4th prompt: Industrial Events and Trade Fairs
-
-` Retrieve articles published on ${dateRangeText} regarding industrial sector events:
-
-International industrial trade fairs (Hannover Messe, CES, Industrie Paris, etc.).
-Conferences specialized in innovation and Industry 4.0.
-Announcements and new products revealed during these events.
-Forums and B2B meetings in the manufacturing industry.
-Presentations of startups and new technologies.
-Important instructions:
-
-Provide up to 10 unique and relevant articles.
-All articles must come from recognized and reliable sources and have a valid URL.
-Only return articles published on ${dateRangeText}.
-Exclude articles that do not meet the date criteria.
-All articles must be unique (no duplicates).
-Each article should be processed in its original language.
-Extract the company names mentioned in the articles and list them in the "companies" field.
-Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
-Respond strictly in valid JSON format as follows:
-`,
-
-// 5th prompt: Industrial Talent Management and Appointments
-
-` Retrieve articles published on ${dateRangeText} about leadership changes in the industry:
-
-Announcement of new CEOs or industrial directors.
-Strategic changes in large manufacturing companies.
-Departures, recruitments, and promotions in industry companies.
-Impact of appointments on business strategies.
-Profiles of new leaders and their backgrounds.
-Important instructions:
-
-Provide up to 10 unique and relevant articles.
-All articles must come from recognized and reliable sources and have a valid URL.
-Only return articles published on ${dateRangeText}.
-Exclude articles that do not meet the date criteria.
-All articles must be unique (no duplicates).
-Each article should be processed in its original language.
-Extract the company names mentioned in the articles and list them in the "companies" field.
-Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
-Respond strictly in valid JSON format as follows:
-`,
-
-// 6th prompt: Cybersecurity and Protection of Industrial Data
-
-` Retrieve articles published on ${dateRangeText} about cybersecurity in the industry:
-
-Recent cyberattack threats on industrial systems.
-New cybersecurity tools and solutions for Industry 4.0.
-Industrial network security and OT protection protocols.
-Attacks on critical infrastructures and company responses.
-Cybersecurity regulations and standards for industries.
-Important instructions:
-
-Provide up to 10 unique and relevant articles.
-All articles must come from recognized and reliable sources and have a valid URL.
-Only return articles published on ${formattedDate}.
-Exclude articles that do not meet the date criteria.
-All articles must be unique (no duplicates).
-Each article should be processed in its original language.
-Extract the company names mentioned in the articles and list them in the "companies" field.
-Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
-Respond strictly in valid JSON format as follows:
-`,
-
-// 7th prompt: Industrial IoT and Advanced Connectivity
-
-` Retrieve articles published on ${dateRangeText} about the Internet of Things in the industry:
-
-New sensors and IoT equipment for factories.
-Impact of 5G on industrial connectivity.
-Deployment of IoT management solutions in production sites.
-Startups developing IoT platforms for the industry.
-IoT data monitoring and analytics technologies.
-Important instructions:
-
-Provide up to 10 unique and relevant articles.
-All articles must come from recognized and reliable sources and have a valid URL.
-Only return articles published on ${dateRangeText}.
-Exclude articles that do not meet the date criteria.
-All articles must be unique (no duplicates).
-Each article should be processed in its original language.
-Extract the company names mentioned in the articles and list them in the "companies" field.
-Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
-Respond strictly in valid JSON format as follows:
-`,
-
-// 8th prompt: Sustainable Development and Energy Transition
-
-` Retrieve articles published on ${dateRangeText} regarding industrial sustainability:
-
-Energy efficiency solutions for factories.
-Adoption of renewable energy in industrial sites.
-Strategies for reducing carbon emissions.
-Advanced recycling and circular economy technologies.
-Investments and grants for green industrial projects.
-Important instructions:
-
-Provide up to 10 unique and relevant articles.
-All articles must come from recognized and reliable sources and have a valid URL.
-Only return articles published on ${dateRangeText}.
-Exclude articles that do not meet the date criteria.
-All articles must be unique (no duplicates).
-Each article should be processed in its original language.
-Extract the company names mentioned in the articles and list them in the "companies" field.
-Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
-Respond strictly in valid JSON format as follows:
 `,
 
   ];
@@ -1130,10 +976,17 @@ app.post("/api/submit-article", async (req, res) => {
   }
 
   const prompt = `
-    Analysez l'article provenant de cette URL : ${url}  
-    - Vérifiez la fiabilité et la pertinence.  
-    - Résumez le contenu et structurez-le pour la publication.  
-    - Retournez uniquement les informations sous format JSON strictement valide au format suivant :
+    Analysez l'article provenant de cette URL : ${url}.  
+    L'article doit respecter ces critères :
+    - Être publié ce mois-ci (vérifiez la date).  
+    - Être issu d'une source fiable et reconnue (vérifiez le domaine).  
+    - Traiter d'un sujet lié à l'industrie : innovation industrielle, production, supply chain, automatisation, industrie 4.0, etc.  
+
+    Donnez un **score de pertinence sur 10** (pertinence_score).  
+    - Si la pertinence est inférieure à 6, considérez que l'article est **non pertinent**.  
+    - Si l'article ne respecte pas **tous** les critères, refusez-le.  
+
+    Retournez uniquement les informations sous format JSON strictement valide :
 
     {
       "title": "Titre de l'article",
@@ -1144,7 +997,8 @@ app.post("/api/submit-article", async (req, res) => {
       "source": "Nom du site",
       "url": "${url}",
       "language": "fr",
-      "companies": ["Entreprise1", "Entreprise2"]
+      "companies": ["Entreprise1", "Entreprise2"],
+      "pertinence_score": 8
     }
   `;
 
@@ -1160,6 +1014,7 @@ app.post("/api/submit-article", async (req, res) => {
     );
 
     const rawContent = response.data.choices[0].message.content;
+    console.log("🔍 Réponse brute Perplexity :", rawContent);
 
     let parsedResponse;
     try {
@@ -1167,10 +1022,47 @@ app.post("/api/submit-article", async (req, res) => {
       if (jsonStart === -1) throw new Error("Aucun JSON détecté !");
       parsedResponse = JSON.parse(rawContent.slice(jsonStart));
 
-      if (!parsedResponse.title || !parsedResponse.url) throw new Error("JSON mal formaté !");
+      if (!parsedResponse.title || !parsedResponse.url || !parsedResponse.pertinence_score) {
+        throw new Error("JSON mal formaté !");
+      }
     } catch (error) {
       console.error("❌ Réponse Perplexity invalide :", error.message);
-      return res.status(500).json({ message: "❌ Erreur de format JSON." });
+      return res.status(500).json({ message: "❌ Erreur de format JSON.", rawResponse });
+    }
+
+    // Vérification du score de pertinence
+    if (parsedResponse.pertinence_score < 6) {
+      return res.status(400).json({
+        message: "❌ L'article a été jugé comme peu pertinent.",
+        rawResponse: `Score de pertinence : ${parsedResponse.pertinence_score}/10`
+      });
+    }
+
+    // Vérification de la récence de l’article
+    const articleDate = new Date(parsedResponse.date);
+    const today = new Date();
+    if (
+      articleDate.getFullYear() !== today.getFullYear() ||
+      articleDate.getMonth() !== today.getMonth()
+    ) {
+      return res.status(400).json({
+        message: "❌ L'article n'est pas récent (doit être publié ce mois-ci).",
+        rawResponse: `Date de l'article : ${parsedResponse.date}`
+      });
+    }
+
+    // Vérification de la pertinence industrielle
+    const industrialKeywords = ["industrie", "usine", "supply chain", "robotique", "automatisation", "manufacturing", "industrie 4.0"];
+    const relevant = industrialKeywords.some(keyword =>
+      parsedResponse.description.toLowerCase().includes(keyword) ||
+      parsedResponse.title.toLowerCase().includes(keyword)
+    );
+
+    if (!relevant) {
+      return res.status(400).json({
+        message: "❌ L'article ne traite pas d'un sujet industriel.",
+        rawResponse: `Sujet détecté : ${parsedResponse.description}`
+      });
     }
 
     // Vérifier si l'article existe déjà en base
@@ -1181,11 +1073,16 @@ app.post("/api/submit-article", async (req, res) => {
 
     return res.json({
       message: created ? "✅ Article validé et publié !" : "🔄 Article déjà existant.",
+      rawResponse,
       data: parsedResponse
     });
+
   } catch (error) {
     console.error("❌ Erreur API Perplexity :", error.message);
-    return res.status(500).json({ message: "❌ Erreur lors de l'analyse de l'article." });
+    return res.status(500).json({
+      message: "❌ Erreur lors de l'analyse de l'article.",
+      rawResponse: error.message
+    });
   }
 });
 

@@ -975,6 +975,7 @@ app.post("/api/submit-article", async (req, res) => {
     return res.status(400).json({ message: "❌ L'URL semble invalide ou inaccessible." });
   }
 
+  // On construit le prompt
   const prompt = `
 Analysez l'article provenant de cette URL : ${url}.
     
@@ -1010,6 +1011,7 @@ Critères stricts : L'article doit obligatoirement respecter tous ces critères 
   `;
 
   try {
+    // Appel à l'API Perplexity
     const response = await axios.post(
       "https://api.perplexity.ai/chat/completions",
       {
@@ -1020,28 +1022,34 @@ Critères stricts : L'article doit obligatoirement respecter tous ces critères 
       { headers: { "Authorization": `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" } }
     );
 
-    const rawContent = response.data.choices[0].message.content;
-    console.log("🔍 Réponse brute Perplexity :", rawContent);
+    // On stocke la réponse brute dans rawResponse
+    const rawResponse = response.data.choices[0].message.content;
+    console.log("🔍 Réponse brute Perplexity :", rawResponse);
 
     let parsedResponse;
     try {
-      const jsonStart = rawContent.indexOf("{");
+      const jsonStart = rawResponse.indexOf("{");
       if (jsonStart === -1) throw new Error("Aucun JSON détecté !");
-      parsedResponse = JSON.parse(rawContent.slice(jsonStart));
+      parsedResponse = JSON.parse(rawResponse.slice(jsonStart));
 
+      // On vérifie quelques champs obligatoires
       if (!parsedResponse.title || !parsedResponse.url || !parsedResponse.pertinence_score) {
         throw new Error("JSON mal formaté !");
       }
     } catch (error) {
       console.error("❌ Réponse Perplexity invalide :", error.message);
-      return res.status(500).json({ message: "❌ Erreur de format JSON.", rawResponse });
+      // On renvoie rawResponse dans tous les cas
+      return res.status(500).json({
+        message: "❌ Erreur de format JSON.",
+        rawResponse // <-- On renvoie la réponse brute pour l'afficher côté front
+      });
     }
 
     // Vérification du score de pertinence
     if (parsedResponse.pertinence_score < 6) {
       return res.status(400).json({
         message: "❌ L'article a été jugé comme peu pertinent.",
-        rawResponse: `Score de pertinence : ${parsedResponse.pertinence_score}/10`
+        rawResponse: rawResponse // On renvoie la réponse brute
       });
     }
 
@@ -1054,7 +1062,7 @@ Critères stricts : L'article doit obligatoirement respecter tous ces critères 
     ) {
       return res.status(400).json({
         message: "❌ L'article n'est pas récent (doit être publié ce mois-ci).",
-        rawResponse: `Date de l'article : ${parsedResponse.date}`
+        rawResponse: rawResponse
       });
     }
 
@@ -1068,7 +1076,7 @@ Critères stricts : L'article doit obligatoirement respecter tous ces critères 
     if (!relevant) {
       return res.status(400).json({
         message: "❌ L'article ne traite pas d'un sujet industriel.",
-        rawResponse: `Sujet détecté : ${parsedResponse.description}`
+        rawResponse: rawResponse
       });
     }
 
@@ -1080,7 +1088,7 @@ Critères stricts : L'article doit obligatoirement respecter tous ces critères 
 
     return res.json({
       message: created ? "✅ Article validé et publié !" : "🔄 Article déjà existant.",
-      rawResponse,
+      rawResponse,        // On renvoie toujours la réponse brute
       data: parsedResponse
     });
 

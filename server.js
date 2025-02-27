@@ -562,201 +562,181 @@ async function executeNewsPrompts() {
 
 
 
-// 1er prompt : Investissements industriels et levées de fonds
+// 1st prompt: Industrial Investments and Fundraising
 
-`
-Récupérez les articles publiés le ${dateRangeText} sur les investissements et financements dans l'industrie :  
+` Retrieve articles published on ${dateRangeText} regarding investments and funding in the industry:
 
-- Levées de fonds réalisées par des startups industrielles.  
-- Startups ayant levé des fonds : montants levés, investisseurs impliqués, objectifs.  
-- Investissements majeurs dans l’industrie (expansion d’usines, nouveaux projets).  
-- Fonds d’investissement spécialisés dans l’industrie et leur impact.  
-- Subventions gouvernementales ou aides financières pour l'innovation industrielle.  
+Fundraising by industrial startups.
+Startups that raised funds: amounts raised, investors involved, goals.
+Major investments in the industry (factory expansions, new projects).
+Investment funds specialized in the industry and their impact.
+Government grants or financial aids for industrial innovation.
+Important instructions:
 
-
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${dateRangeText}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
-- Répondre strictement en JSON valide au format suivant :  
-
-
+Provide up to 10 unique and relevant articles.
+All articles must come from recognized and reliable sources and have a valid URL.
+Only return articles published on ${dateRangeText}.
+Exclude articles that do not meet the date criteria.
+All articles must be unique (no duplicates).
+Each article should be processed in its original language.
+Extract the company names mentioned in the articles and list them in the "companies" field.
+Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
+Respond strictly in valid JSON format as follows:
 `,
 
-// 2e prompt : Fusions, acquisitions et alliances stratégiques
+// 2nd prompt: Mergers, Acquisitions, and Strategic Alliances
 
-`
-Récupérez les articles publiés le ${dateRangeText} sur les opérations stratégiques dans l’industrie :  
+` Retrieve articles published on ${dateRangeText} about strategic operations in the industry:
 
-- Fusions et acquisitions d’entreprises industrielles et fournisseurs.  
-- Partenariats stratégiques entre entreprises et startups industrielles.  
-- Rachats de solutions SaaS, IoT ou IA par de grandes entreprises industrielles.  
-- Joint-ventures et alliances pour l’innovation industrielle.  
-- Impact des acquisitions sur les marchés et la concurrence. 
+Mergers and acquisitions of industrial companies and suppliers.
+Strategic partnerships between companies and industrial startups.
+Acquisitions of SaaS, IoT, or AI solutions by large industrial companies.
+Joint ventures and alliances for industrial innovation.
+Impact of acquisitions on markets and competition.
+Important instructions:
 
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${dateRangeText}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
-- Répondre strictement en JSON valide au format suivant :  
- 
+Provide up to 10 unique and relevant articles.
+All articles must come from recognized and reliable sources and have a valid URL.
+Only return articles published on ${dateRangeText}.
+Exclude articles that do not meet the date criteria.
+All articles must be unique (no duplicates).
+Each article should be processed in its original language.
+Extract the company names mentioned in the articles and list them in the "companies" field.
+Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
+Respond strictly in valid JSON format as follows:
 `,
 
-// 3e prompt : Innovations technologiques et transformation digitale
+// 3rd prompt: Technological Innovations and Digital Transformation
 
-`
-Récupérez les articles publiés le ${dateRangeText} sur les nouvelles technologies dans l’industrie :  
+` Retrieve articles published on ${dateRangeText} about new technologies in the industry:
 
-- Lancements de nouveaux équipements industriels.  
-- Déploiement d’applications logicielles pour l’industrie (SaaS, ERP, MES).  
-- Nouvelles technologies intégrées en production (IA, IoT, robotique).  
-- Présentation de nouveaux matériaux et procédés de fabrication avancés.  
-- Innovations impactant les lignes de production et la logistique. 
+Launches of new industrial equipment.
+Deployment of software applications for the industry (SaaS, ERP, MES).
+New technologies integrated into production (AI, IoT, robotics).
+Presentation of new materials and advanced manufacturing processes.
+Innovations impacting production lines and logistics.
+Important instructions:
 
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${dateRangeText}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
-- Répondre strictement en JSON valide au format suivant :  
- 
+Provide up to 10 unique and relevant articles.
+All articles must come from recognized and reliable sources and have a valid URL.
+Only return articles published on ${dateRangeText}.
+Exclude articles that do not meet the date criteria.
+All articles must be unique (no duplicates).
+Each article should be processed in its original language.
+Extract the company names mentioned in the articles and list them in the "companies" field.
+Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
+Respond strictly in valid JSON format as follows:
 `,
 
-// 4e prompt : Événements industriels et salons professionnels
+// 4th prompt: Industrial Events and Trade Fairs
 
-`
-Récupérez les articles publiés le ${dateRangeText} sur les événements du secteur industriel :  
+` Retrieve articles published on ${dateRangeText} regarding industrial sector events:
 
-- Salons industriels internationaux (Hannover Messe, CES, Industrie Paris, etc.).  
-- Conférences spécialisées en innovation et Industrie 4.0.  
-- Annonces et nouveautés dévoilées lors de ces événements.  
-- Forums et rendez-vous B2B de l’industrie manufacturière.  
-- Présentations de startups et nouvelles technologies.  
+International industrial trade fairs (Hannover Messe, CES, Industrie Paris, etc.).
+Conferences specialized in innovation and Industry 4.0.
+Announcements and new products revealed during these events.
+Forums and B2B meetings in the manufacturing industry.
+Presentations of startups and new technologies.
+Important instructions:
 
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${dateRangeText}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
-- Répondre strictement en JSON valide au format suivant :  
-
+Provide up to 10 unique and relevant articles.
+All articles must come from recognized and reliable sources and have a valid URL.
+Only return articles published on ${dateRangeText}.
+Exclude articles that do not meet the date criteria.
+All articles must be unique (no duplicates).
+Each article should be processed in its original language.
+Extract the company names mentioned in the articles and list them in the "companies" field.
+Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
+Respond strictly in valid JSON format as follows:
 `,
 
-// 5e prompt : Nominations et gestion des talents industriels
+// 5th prompt: Industrial Talent Management and Appointments
 
-`
-Récupérez les articles publiés le ${dateRangeText} sur les changements de direction dans l’industrie :  
+` Retrieve articles published on ${dateRangeText} about leadership changes in the industry:
 
-- Annonce de nouveaux PDG ou directeurs industriels.  
-- Changements stratégiques dans les grandes entreprises manufacturières.  
-- Départs, recrutements et promotions dans les entreprises du secteur.  
-- Impact des nominations sur les stratégies d’entreprise.  
-- Profils des nouveaux dirigeants et leur parcours.  
+Announcement of new CEOs or industrial directors.
+Strategic changes in large manufacturing companies.
+Departures, recruitments, and promotions in industry companies.
+Impact of appointments on business strategies.
+Profiles of new leaders and their backgrounds.
+Important instructions:
 
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${dateRangeText}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
-- Répondre strictement en JSON valide au format suivant :  
-
+Provide up to 10 unique and relevant articles.
+All articles must come from recognized and reliable sources and have a valid URL.
+Only return articles published on ${dateRangeText}.
+Exclude articles that do not meet the date criteria.
+All articles must be unique (no duplicates).
+Each article should be processed in its original language.
+Extract the company names mentioned in the articles and list them in the "companies" field.
+Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
+Respond strictly in valid JSON format as follows:
 `,
 
-// 6e prompt : Cybersécurité et protection des données industrielles
+// 6th prompt: Cybersecurity and Protection of Industrial Data
 
-`
-Récupérez les articles publiés le ${dateRangeText} sur la cybersécurité dans l’industrie :  
+` Retrieve articles published on ${dateRangeText} about cybersecurity in the industry:
 
-- Menaces récentes de cyberattaques sur les systèmes industriels.  
-- Nouveaux outils et solutions de cybersécurité pour l’Industrie 4.0.  
-- Sécurité des réseaux industriels et protocoles de protection OT.  
-- Attaques contre les infrastructures critiques et réponses des entreprises.  
-- Règlementations et normes de cybersécurité pour les industries.  
+Recent cyberattack threats on industrial systems.
+New cybersecurity tools and solutions for Industry 4.0.
+Industrial network security and OT protection protocols.
+Attacks on critical infrastructures and company responses.
+Cybersecurity regulations and standards for industries.
+Important instructions:
 
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
-- Répondre strictement en JSON valide au format suivant :  
-
-
+Provide up to 10 unique and relevant articles.
+All articles must come from recognized and reliable sources and have a valid URL.
+Only return articles published on ${formattedDate}.
+Exclude articles that do not meet the date criteria.
+All articles must be unique (no duplicates).
+Each article should be processed in its original language.
+Extract the company names mentioned in the articles and list them in the "companies" field.
+Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
+Respond strictly in valid JSON format as follows:
 `,
 
-// 7e prompt : IoT industriel et connectivité avancée
+// 7th prompt: Industrial IoT and Advanced Connectivity
 
-`
-Récupérez les articles publiés le ${dateRangeText} sur l’Internet des objets dans l’industrie :  
+` Retrieve articles published on ${dateRangeText} about the Internet of Things in the industry:
 
-- Nouveaux capteurs et équipements IoT pour les usines.  
-- Impact de la 5G sur la connectivité industrielle.  
-- Déploiement de solutions de gestion IoT dans les sites de production.  
-- Startups développant des plateformes IoT pour l’industrie.  
-- Technologies de monitoring et analyse des données IoT.  
+New sensors and IoT equipment for factories.
+Impact of 5G on industrial connectivity.
+Deployment of IoT management solutions in production sites.
+Startups developing IoT platforms for the industry.
+IoT data monitoring and analytics technologies.
+Important instructions:
 
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${dateRangeText}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
-- Répondre strictement en JSON valide au format suivant :  
-
+Provide up to 10 unique and relevant articles.
+All articles must come from recognized and reliable sources and have a valid URL.
+Only return articles published on ${dateRangeText}.
+Exclude articles that do not meet the date criteria.
+All articles must be unique (no duplicates).
+Each article should be processed in its original language.
+Extract the company names mentioned in the articles and list them in the "companies" field.
+Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
+Respond strictly in valid JSON format as follows:
 `,
 
-// 8e prompt : Développement durable et transition énergétique
+// 8th prompt: Sustainable Development and Energy Transition
 
-`
-Récupérez les articles publiés le ${dateRangeText} sur la durabilité industrielle :  
+` Retrieve articles published on ${dateRangeText} regarding industrial sustainability:
 
-- Solutions d’efficacité énergétique pour les usines.  
-- Adoption des énergies renouvelables dans les sites industriels.  
-- Stratégies de réduction des émissions carbone.  
-- Technologies avancées de recyclage et d’économie circulaire.  
-- Investissements et subventions pour des projets industriels verts.  
+Energy efficiency solutions for factories.
+Adoption of renewable energy in industrial sites.
+Strategies for reducing carbon emissions.
+Advanced recycling and circular economy technologies.
+Investments and grants for green industrial projects.
+Important instructions:
 
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${dateRangeText}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
-- Répondre strictement en JSON valide au format suivant :  
-
+Provide up to 10 unique and relevant articles.
+All articles must come from recognized and reliable sources and have a valid URL.
+Only return articles published on ${dateRangeText}.
+Exclude articles that do not meet the date criteria.
+All articles must be unique (no duplicates).
+Each article should be processed in its original language.
+Extract the company names mentioned in the articles and list them in the "companies" field.
+Generate tags based on the language of the article (e.g., "Investment", "Industrial Startup", "Industry 4.0").
+Respond strictly in valid JSON format as follows:
 `,
-
 
   ];
 
@@ -1136,6 +1116,88 @@ app.get("/api/companies", async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
+
+app.post("/api/submit-article", async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ message: "❌ Aucune URL fournie." });
+
+  console.log(`🔍 Vérification de l'URL soumise : ${url}`);
+
+  // Vérification si l'URL est valide
+  if (!await isUrlValid(url)) {
+    return res.status(400).json({ message: "❌ L'URL semble invalide ou inaccessible." });
+  }
+
+  const prompt = `
+    Analysez l'article provenant de cette URL : ${url}  
+    - Vérifiez la fiabilité et la pertinence.  
+    - Résumez le contenu et structurez-le pour la publication.  
+    - Retournez uniquement les informations sous format JSON strictement valide au format suivant :
+
+    {
+      "title": "Titre de l'article",
+      "description": "Résumé de l'article",
+      "image": "URL de l'image",
+      "tags": ["tag1", "tag2"],
+      "date": "YYYY-MM-DD HH:mm:ss",
+      "source": "Nom du site",
+      "url": "${url}",
+      "language": "fr",
+      "companies": ["Entreprise1", "Entreprise2"]
+    }
+  `;
+
+  try {
+    const response = await axios.post(
+      "https://api.perplexity.ai/chat/completions",
+      {
+        model: "sonar-pro",
+        max_tokens: 2000,
+        messages: [{ role: "user", content: prompt }]
+      },
+      { headers: { "Authorization": `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" } }
+    );
+
+    const rawContent = response.data.choices[0].message.content;
+
+    let parsedResponse;
+    try {
+      const jsonStart = rawContent.indexOf("{");
+      if (jsonStart === -1) throw new Error("Aucun JSON détecté !");
+      parsedResponse = JSON.parse(rawContent.slice(jsonStart));
+
+      if (!parsedResponse.title || !parsedResponse.url) throw new Error("JSON mal formaté !");
+    } catch (error) {
+      console.error("❌ Réponse Perplexity invalide :", error.message);
+      return res.status(500).json({ message: "❌ Erreur de format JSON." });
+    }
+
+    // Vérifier si l'article existe déjà en base
+    const [article, created] = await Article.findOrCreate({
+      where: { url },
+      defaults: parsedResponse
+    });
+
+    return res.json({
+      message: created ? "✅ Article validé et publié !" : "🔄 Article déjà existant.",
+      data: parsedResponse
+    });
+  } catch (error) {
+    console.error("❌ Erreur API Perplexity :", error.message);
+    return res.status(500).json({ message: "❌ Erreur lors de l'analyse de l'article." });
+  }
+});
+
+
+async function isUrlValid(url) {
+  try {
+    const response = await axios.get(url, { timeout: 8000, maxRedirects: 5 });
+    return response.status >= 200 && response.status < 500; // Accepte les statuts 2xx et 3xx
+  } catch (error) {
+    return false; // L'URL est invalide si la requête échoue
+  }
+}
 
 
 

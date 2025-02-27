@@ -65,7 +65,13 @@ const Article = sequelize.define("Article", {
     type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: false,
     defaultValue: []
-  }
+  },
+
+ isManualSubmission: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false // Par défaut, les articles sont automatiques
+        }
 });
 
 

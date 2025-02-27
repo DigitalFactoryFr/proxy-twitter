@@ -20,6 +20,9 @@ const GOOGLE_SEARCH_CX = process.env.GOOGLE_SEARCH_CX;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
+console.log(`🚀 Serveur démarré à ${new Date().toISOString()}`);
+
+
 app.use(express.json());  
 app.use(express.urlencoded({ extended: true })); 
 
@@ -774,7 +777,13 @@ async function fetchArticleImage(url) {
 executeNewsPrompts();
 
 async function updateArticles() {
-  console.log("🔄 Mise à jour des articles en cours...");
+
+console.log(`🔄 Exécution de updateArticles() à ${new Date().toISOString()}`);
+
+console.log("🔄 Mise à jour des articles en cours...");
+
+console.log(`🔄 Exécution de updateArticles() à ${new Date().toISOString()}`);
+
 
   // Exécuter la récupération des articles
   await executeNewsPrompts();

@@ -549,7 +549,7 @@ async function executeNewsPrompts() {
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
   const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-  let blockStart = currentHour - 6;
+  let blockStart = currentHour - 22;
   if (blockStart < 0) {
     blockStart = 0; // Gérer les heures négatives si nécessaire
   }
@@ -560,43 +560,194 @@ async function executeNewsPrompts() {
   // Définition des sujets pour chaque prompt
   const prompts = [
 
-// 1er prompt : Actualités Industrie 4.0 et sujets associés
+
+
+// 1er prompt : Investissements industriels et levées de fonds
 
 `
-
-Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
+Récupérez les articles publiés le ${dateRangeText} sur les investissements et financements dans l'industrie :  
 
 - Levées de fonds réalisées par des startups industrielles.  
+- Startups ayant levé des fonds : montants levés, investisseurs impliqués, objectifs.  
 - Investissements majeurs dans l’industrie (expansion d’usines, nouveaux projets).  
-- Fonds d’investissement spécialisés dans l’industrie et leur impact sur le secteur.  
-- Startups industrielles ayant levé des fonds : montants levés, investisseurs impliqués, objectifs des financements.  
-- Subventions gouvernementales ou aides financières pour l'innovation industrielle.
-- Fusions et acquisitions dans l’industrie (entreprises industrielles, startups, fournisseurs).  
-- Partenariats stratégiques entre entreprises industrielles et startups.  
-- Grandes entreprises industrielles rachetant des solutions SaaS, IoT ou IA.  
-- Joint-ventures et alliances stratégiques pour l’innovation industrielle.  
-- Impact des acquisitions sur les marchés et la concurrence industrielle.
+- Fonds d’investissement spécialisés dans l’industrie et leur impact.  
+- Subventions gouvernementales ou aides financières pour l'innovation industrielle.  
+
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${dateRangeText}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
+- Répondre strictement en JSON valide au format suivant :  
+
+
+`,
+
+// 2e prompt : Fusions, acquisitions et alliances stratégiques
+
+`
+Récupérez les articles publiés le ${dateRangeText} sur les opérations stratégiques dans l’industrie :  
+
+- Fusions et acquisitions d’entreprises industrielles et fournisseurs.  
+- Partenariats stratégiques entre entreprises et startups industrielles.  
+- Rachats de solutions SaaS, IoT ou IA par de grandes entreprises industrielles.  
+- Joint-ventures et alliances pour l’innovation industrielle.  
+- Impact des acquisitions sur les marchés et la concurrence. 
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${dateRangeText}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
+- Répondre strictement en JSON valide au format suivant :  
+ 
+`,
+
+// 3e prompt : Innovations technologiques et transformation digitale
+
+`
+Récupérez les articles publiés le ${dateRangeText} sur les nouvelles technologies dans l’industrie :  
+
 - Lancements de nouveaux équipements industriels.  
-- Déploiement de nouvelles applications logicielles pour l’industrie (SaaS, ERP, MES, etc.).  
-- Nouvelles technologies intégrées dans les processus industriels (IA, IoT, robotique).  
+- Déploiement d’applications logicielles pour l’industrie (SaaS, ERP, MES).  
+- Nouvelles technologies intégrées en production (IA, IoT, robotique).  
 - Présentation de nouveaux matériaux et procédés de fabrication avancés.  
-- Innovations technologiques qui transforment les lignes de production et la logistique.
-- Lancements de nouveaux équipements industriels.  
+- Innovations impactant les lignes de production et la logistique. 
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${dateRangeText}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
+- Répondre strictement en JSON valide au format suivant :  
+ 
+`,
+
+// 4e prompt : Événements industriels et salons professionnels
+
+`
+Récupérez les articles publiés le ${dateRangeText} sur les événements du secteur industriel :  
+
 - Salons industriels internationaux (Hannover Messe, CES, Industrie Paris, etc.).  
-- Conférences spécialisées dans l’innovation et l’Industrie 4.0.  
+- Conférences spécialisées en innovation et Industrie 4.0.  
 - Annonces et nouveautés dévoilées lors de ces événements.  
-- Forums et rendez-vous B2B importants dans l’industrie manufacturière.  
-- Présentations de startups et nouvelles technologies lors des événements.
+- Forums et rendez-vous B2B de l’industrie manufacturière.  
+- Présentations de startups et nouvelles technologies.  
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${dateRangeText}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
+- Répondre strictement en JSON valide au format suivant :  
+
+`,
+
+// 5e prompt : Nominations et gestion des talents industriels
+
+`
+Récupérez les articles publiés le ${dateRangeText} sur les changements de direction dans l’industrie :  
+
 - Annonce de nouveaux PDG ou directeurs industriels.  
-- Changements stratégiques au sein des grandes entreprises manufacturières.  
+- Changements stratégiques dans les grandes entreprises manufacturières.  
 - Départs, recrutements et promotions dans les entreprises du secteur.  
-- Impact de ces nominations sur les stratégies d’entreprise.  
-- Profils des nouveaux dirigeants et leurs parcours.   
+- Impact des nominations sur les stratégies d’entreprise.  
+- Profils des nouveaux dirigeants et leur parcours.  
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${dateRangeText}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
+- Répondre strictement en JSON valide au format suivant :  
+
+`,
+
+// 6e prompt : Cybersécurité et protection des données industrielles
+
+`
+Récupérez les articles publiés le ${dateRangeText} sur la cybersécurité dans l’industrie :  
+
+- Menaces récentes de cyberattaques sur les systèmes industriels.  
+- Nouveaux outils et solutions de cybersécurité pour l’Industrie 4.0.  
+- Sécurité des réseaux industriels et protocoles de protection OT.  
+- Attaques contre les infrastructures critiques et réponses des entreprises.  
+- Règlementations et normes de cybersécurité pour les industries.  
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
 - Retourner uniquement les articles publiés le ${formattedDate}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
+- Répondre strictement en JSON valide au format suivant :  
+
+
+`,
+
+// 7e prompt : IoT industriel et connectivité avancée
+
+`
+Récupérez les articles publiés le ${dateRangeText} sur l’Internet des objets dans l’industrie :  
+
+- Nouveaux capteurs et équipements IoT pour les usines.  
+- Impact de la 5G sur la connectivité industrielle.  
+- Déploiement de solutions de gestion IoT dans les sites de production.  
+- Startups développant des plateformes IoT pour l’industrie.  
+- Technologies de monitoring et analyse des données IoT.  
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${dateRangeText}.  
+- Exclure les articles qui ne correspondent pas aux critères de date.  
+- Tous les articles doivent être uniques (pas de doublons).  
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
+- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
+- Répondre strictement en JSON valide au format suivant :  
+
+`,
+
+// 8e prompt : Développement durable et transition énergétique
+
+`
+Récupérez les articles publiés le ${dateRangeText} sur la durabilité industrielle :  
+
+- Solutions d’efficacité énergétique pour les usines.  
+- Adoption des énergies renouvelables dans les sites industriels.  
+- Stratégies de réduction des émissions carbone.  
+- Technologies avancées de recyclage et d’économie circulaire.  
+- Investissements et subventions pour des projets industriels verts.  
+
+Instructions importantes :  
+- Fournir jusqu'à 10 articles uniques et pertinents.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Retourner uniquement les articles publiés le ${dateRangeText}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  

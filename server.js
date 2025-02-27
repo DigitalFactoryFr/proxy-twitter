@@ -365,6 +365,41 @@ await sequelize.sync(); // 🔄 Assure-toi que les tables sont bien synchronisé
   }
 })();
 
+async function isUrlValid(url) {
+    try {
+        const response = await axios.get(url, { timeout: 8000, maxRedirects: 5 });
+        return response.status >= 200 && response.status < 500; // Accepte les 2xx, 3xx et 4xx (sauf 404)
+    } catch (error) {
+        return false; // L'URL est invalide si la requête échoue
+    }
+}
+
+
+
+async function deleteInvalidArticles() {
+    console.log("🔍 Vérification des articles en base...");
+
+    const articles = await Article.findAll(); // Récupère tous les articles
+    for (const article of articles) {
+        const isStillValid = await isUrlValid(article.url);
+        
+        if (!isStillValid) {
+            console.warn(`🟠 Vérification supplémentaire pour : ${article.title}`);
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Attendre 3s avant un deuxième test
+
+            const recheck = await isUrlValid(article.url);
+            if (!recheck) {
+                console.log(`🗑️ Suppression article: ${article.title} (URL invalide)`);
+                await Article.destroy({ where: { id: article.id } });
+            } else {
+                console.log(`✅ Article conservé après seconde vérification: ${article.title}`);
+            }
+        }
+    }
+
+    console.log("✅ Nettoyage terminé.");
+}
+
 
 
 // 🔥 Fonction pour récupérer les actualités existantes depuis votre page actualités
@@ -501,11 +536,6 @@ async function sendPrompt(topicText) {
   }
 }
 
-// Exemple de fonction pour récupérer une image (à adapter selon vos besoins)
-async function fetchArticleImage(url) {
-  // Implémentez ici la logique pour récupérer une image à partir de l'URL de l'article
-  return "https://exemple.com/default-image.jpg";
-}
 
 // 🔄 Fonction qui enchaîne plusieurs prompts séquentiellement
 async function executeNewsPrompts() {
@@ -516,7 +546,7 @@ async function executeNewsPrompts() {
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
   const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-  let blockStart = currentHour - 3;
+  let blockStart = currentHour - 24;
   if (blockStart < 0) {
     blockStart = 0; // Gérer les heures négatives si nécessaire
   }
@@ -529,13 +559,9 @@ async function executeNewsPrompts() {
     // 1er prompt : Actualités Industrie 4.0 et sujets associés
     `
 Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
-- Industrie 4.0
-- Applications industrielles
-- SaaS industrielle
-- IoT industriel
-- Logiciels industriels
-- Startups industrielles
-- Automatisation et digitalisation dans l'industrie
+
+- Levée de fond dans le secteur industriel, 
+- Levée de fond par les startups qui opère dans le secteur industriel
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
@@ -551,173 +577,24 @@ Instructions importantes :
 - Répondre strictement en JSON valide au format suivant :  
 `,
 
-    // 2ème prompt : Levées de fonds/acquisitions dans les startups industrielles, événements et salons à venir
-    `Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
-
-- Levées de fonds industrielles
-- Fusions et acquisitions dans le secteur industriel
-- Lancements de nouveaux produits industriels
-- Lancement de nouvelles applications ou logiciels industriels
-- Partenariats stratégiques entre entreprises industrielles
-- Startups industrielles : Levées de fonds, innovations, etc.
-- Innovations disruptives : Technologies révolutionnaires, nouveaux business models, etc.
-- Partenariats stratégiques : Collaborations entre startups et grands groupes industriels.
-
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.  
-- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
-- Répondre strictement en JSON valide au format suivant : `,
-
-    // 3ème prompt     
-
-`Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
-
-- Salons industriels (ex: Hannover Messe, CES, etc.)
-- Conférences majeures (ex: Web Summit, VivaTech, etc.)
-- Lancements de produits industriels
-- Événements sectoriels (automobile, aérospatial, etc.)
-- Nominations de nouveaux dirigeants dans le secteur industriel
-
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.  
-- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
-- Répondre strictement en JSON valide au format suivant :  `,
-
-
-// 4ème prompt
-`Récupérez les articles de presse et articles de blog publiés cette semaine, sur les sujets suivants :  
-- Événements majeurs dans le secteur industriel, salons, consutruction nouvelles usines, projets infustriels majeurs, innovations, investissement important, ect.
-
-Instructions importantes :  
-- Fournir jusqu'à 15 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et avoir une URL valide.  
-- Retourner uniquement les articles publiés cette semaine.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Prioriser les articles les plus récents et strictement liés aux sujets demandés avant d’élargir la recherche si nécessaire.  
-- Incluez une diversité maximale dans les sujets abordés, sans répétition.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Automation" en anglais, "Automatisation" en français).  
-- Répondre strictement en JSON valide au format suivant : `,
-
-
-// 1st Prompt: Industry 4.0 News and Related Topics
-`
-Retrieve press articles and blog posts published on ${formattedDate}, on the following topics:  
-- Industry 4.0  
-- Industrial applications  
-- Industrial SaaS  
-- Industrial IoT  
-- Industrial software  
-- Industrial startups  
-- Automation and digitalization in industry  
-
-Important instructions:  
-- Provide up to 10 unique and relevant articles.  
-- All articles must come from recognized sources and have a valid URL.  
-- Return only articles published on ${formattedDate}.  
-- Exclude articles that do not meet the date criteria.  
-- All articles must be unique (no duplicates).  
-- Each article should be processed only in its original language.  
-- Prioritize the most recent articles strictly related to the requested topics before broadening the search if necessary.  
-- Include maximum diversity in the topics covered, without repetition.  
-- Extract the names of companies mentioned in the articles and list them in the "companies" field.  
-- Generate tags based on the language of the article (e.g., "Automation" in English, "Automatisation" in French).  
-- Respond strictly in valid JSON format as follows:  
-`,
-
-// 2nd Prompt: Fundraising/Acquisitions in Industrial Startups, Upcoming Events, and Trade Shows
-`
-Retrieve press articles and blog posts published on ${formattedDate}, on the following topics:  
-
-- Industrial fundraising  
-- Mergers and acquisitions in the industrial sector  
-- Launches of new industrial products  
-- Launches of new industrial applications or software  
-- Strategic partnerships between industrial companies  
-- Industrial startups: Fundraising, innovations, etc.  
-- Disruptive innovations: Revolutionary technologies, new business models, etc.  
-- Strategic partnerships: Collaborations between startups and large industrial groups.  
-
-Important instructions:  
-- Provide up to 10 unique and relevant articles.  
-- All articles must come from recognized sources and have a valid URL.  
-- Return only articles published on ${formattedDate}.  
-- Exclude articles that do not meet the date criteria.  
-- All articles must be unique (no duplicates).  
-- Each article should be processed only in its original language.  
-- Prioritize the most recent articles strictly related to the requested topics before broadening the search if necessary.  
-- Include maximum diversity in the topics covered, without repetition.  
-- Extract the names of companies mentioned in the articles and list them in the "companies" field.  
-- Generate tags based on the language of the article (e.g., "Automation" in English, "Automatisation" in French).  
-- Respond strictly in valid JSON format as follows:  
-`,
-
-// 3rd Prompt: Industrial Trade Shows, Conferences, and Product Launches
-`
-Retrieve press articles and blog posts published on ${formattedDate}, on the following topics:  
-
-- Industrial trade shows (e.g., Hannover Messe, CES, etc.)  
-- Major conferences (e.g., Web Summit, VivaTech, etc.)  
-- Industrial product launches  
-- Sector-specific events (automotive, aerospace, etc.)  
-- Appointments of new leaders in the industrial sector  
-
-Important instructions:  
-- Provide up to 10 unique and relevant articles.  
-- All articles must come from recognized sources and have a valid URL.  
-- Return only articles published on ${formattedDate}.  
-- Exclude articles that do not meet the date criteria.  
-- All articles must be unique (no duplicates).  
-- Each article should be processed only in its original language.  
-- Prioritize the most recent articles strictly related to the requested topics before broadening the search if necessary.  
-- Include maximum diversity in the topics covered, without repetition.  
-- Extract the names of companies mentioned in the articles and list them in the "companies" field.  
-- Generate tags based on the language of the article (e.g., "Automation" in English, "Automatisation" in French).  
-- Respond strictly in valid JSON format as follows:  
-`,
-
-// 4th Prompt: Major Events in the Industrial Sector
-`
-Retrieve press articles and blog posts published this week, on the following topics:  
-- Major events in the industrial sector, trade shows, construction of new factories, major industrial projects, innovations, significant investments, etc.  
-
-Important instructions:  
-- Provide up to 15 unique and relevant articles.  
-- All articles must come from recognized sources and have a valid URL.  
-- Return only articles published this week.  
-- Exclude articles that do not meet the date criteria.  
-- All articles must be unique (no duplicates).  
-- Each article should be processed only in its original language.  
-- Prioritize the most recent articles strictly related to the requested topics before broadening the search if necessary.  
-- Include maximum diversity in the topics covered, without repetition.  
-- Extract the names of companies mentioned in the articles and list them in the "companies" field.  
-- Generate tags based on the language of the article (e.g., "Automation" in English, "Automatisation" in French).  
-- Respond strictly in valid JSON format as follows:  
-`,
 
 
 
 
 
   ];
+
+
+// Fonction pour récupérer l'image d'un article en cas d'absence d'URL d'image
+async function fetchArticleImage(url) {
+    try {
+        const response = await axios.get(url, { timeout: 10000 }); // Augmenter le timeout
+        return response.data.image || "https://digitalfactory.store/default-image.jpg";
+    } catch (error) {
+        console.warn(`⚠️ Impossible de récupérer l'image : ${error.message}`);
+        return "https://digitalfactory.store/default-image.jpg"; // Image par défaut
+    }
+}
 
   // Parcourir chaque prompt et traiter la réponse avant de passer au suivant
   for (let i = 0; i < prompts.length; i++) {
@@ -728,6 +605,12 @@ Important instructions:
     for (const article of articles) {
       console.log(`🔍 Vérification : ${article.title} | Langue: ${article.language}`);
 
+	if (["fr", "fr-FR", "fr-CA"].includes(article.language)) {
+    console.log(`✅ Article en français détecté : ${article.title}`);
+}
+
+
+
       if (article.language === "de") {
         console.log("✅ Article en allemand détecté :", article.title);
       }
@@ -737,26 +620,43 @@ Important instructions:
       }
 
       // Sauvegarde en base de données (utilisez findOrCreate ou upsert selon votre logique)
-      await Article.findOrCreate({
-        where: { url: article.url },
-        defaults: {
-          title: article.title,
-          description: article.description,
-          source: article.source,
-          date: article.date,
-          url: article.url,
-          image: article.image,
-          language: article.language,
-          tags: Array.isArray(article.tags) ? article.tags : [],
-          companies: article.companies,
-        },
+           console.log(`🔍 Vérification : ${article.title} | URL: ${article.url}`);
+
+      // Vérifier si l'URL est valide avant d'insérer
+      if (!await isUrlValid(article.url)) {
+          console.log(`❌ URL invalide, article ignoré: ${article.url}`);
+          continue; // On passe à l'article suivant
+      }
+
+      // Vérifier si l'article existe déjà en base
+      const [savedArticle, created] = await Article.findOrCreate({
+          where: { url: article.url },
+          defaults: {
+              title: article.title,
+              description: article.description,
+              source: article.source,
+              date: article.date,
+              url: article.url,
+              image: article.image || await fetchArticleImage(article.url),
+              language: article.language,
+              tags: Array.isArray(article.tags) ? article.tags : [],
+              companies: article.companies,
+          },
       });
+
+      if (created) {
+          console.log(`✅ Article ajouté: ${article.title}`);
+      } else {
+          console.log(`🔄 Article déjà en base: ${article.title}`);
+      }
+
     }
   }
   console.log("✅ Tous les prompts ont été exécutés et les articles mis à jour !");
   const count = await Article.count();
   console.log("📊 Nombre total d'articles enregistrés en base :", count);
 }
+
 
 // Lancement de la séquence des prompts
 executeNewsPrompts();
@@ -768,14 +668,18 @@ async function updateArticles() {
   await executeNewsPrompts();
 
   console.log("✅ Mise à jour des articles terminée !");
+
+await deleteInvalidArticles(); // 🔥 Nettoie les articles avec des URLs non valides
+ console.log("✅ Nettoyage des articles terminé !");
 }
+
 
 
 // 🏁 Appeler la première fois immédiatement
 updateArticles();
 
 // 🔄 Puis répéter toutes les 3 heures
-setInterval(updateArticles, 3 * 60 * 60 * 1000); // Actualisation toutes les 3 heures
+setInterval(updateArticles, 12 * 60 * 60 * 1000); // Actualisation toutes les 3 heures
 
 
 // 📢 Route API pour récupérer les articles avec filtres généraux

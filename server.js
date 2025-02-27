@@ -976,15 +976,22 @@ app.post("/api/submit-article", async (req, res) => {
   }
 
   const prompt = `
-    Analysez l'article provenant de cette URL : ${url}.  
-    L'article doit respecter ces critères :
-    - Être publié ce mois-ci (vérifiez la date).  
-    - Être issu d'une source fiable et reconnue (vérifiez le domaine).  
-    - Traiter d'un sujet lié à l'industrie : innovation industrielle, production, supply chain, automatisation, industrie 4.0, etc.  
+Analysez l'article provenant de cette URL : ${url}.
+    
+Critères stricts : L'article doit obligatoirement respecter tous ces critères :
 
-    Donnez un **score de pertinence sur 10** (pertinence_score).  
-    - Si la pertinence est inférieure à 6, considérez que l'article est **non pertinent**.  
-    - Si l'article ne respecte pas **tous** les critères, refusez-le.  
+  - Publié ce mois-ci (rejeter si la date n'est pas claire ou trop ancienne).
+  - Issu d'une source fiable : Presse économique, blogs spécialisés, médias d'analyse industrielle.
+  - L'article doit couvrir l'un des sujets suivants :
+    - Levées de fonds industrielles (startups et entreprises industrielles).
+    - Fusions et acquisitions dans le secteur industriel.
+    - Lancements de nouveaux produits industriels (équipements, machines, robots, capteurs, logiciels).
+    - Lancements de nouvelles applications ou logiciels industriels (ERP, MES, IoT, IA).
+    - Partenariats stratégiques entre entreprises industrielles.
+    - Innovations disruptives (technologies révolutionnaires, nouveaux business models).
+    - Salons et conférences industrielles (Hannover Messe, Web Summit, CES, VivaTech).
+    - Nominations de nouveaux dirigeants dans des entreprises industrielles majeures.
+    - Événements sectoriels (automobile, aérospatial, supply chain, maintenance prédictive, robotisation).
 
     Retournez uniquement les informations sous format JSON strictement valide :
 

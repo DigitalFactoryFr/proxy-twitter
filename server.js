@@ -546,7 +546,7 @@ async function executeNewsPrompts() {
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
   const formattedDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-  let blockStart = currentHour - 24;
+  let blockStart = currentHour - 6;
   if (blockStart < 0) {
     blockStart = 0; // Gérer les heures négatives si nécessaire
   }

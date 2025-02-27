@@ -556,8 +556,10 @@ async function executeNewsPrompts() {
 
   // Définition des sujets pour chaque prompt
   const prompts = [
-    // 1er prompt : Actualités Industrie 4.0 et sujets associés
-    `
+
+// 1er prompt : Actualités Industrie 4.0 et sujets associés
+
+`
 
 Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
 
@@ -578,14 +580,12 @@ Instructions importantes :
 - Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").  
 - Répondre strictement en JSON valide au format suivant :  
 
-    // prompt 2:
-
 `,
 
+ // prompt 2:
 
-    `
 
-
+ `
 
 Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
 
@@ -607,19 +607,12 @@ Instructions importantes :
 - Répondre strictement en JSON valide au format suivant :  
 
 
-
 `,
-
-
 
  // prompt 3:
 
-`,
 
-
-    `
-
-
+`
 
 Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
 
@@ -641,17 +634,12 @@ Instructions importantes :
 - Répondre strictement en JSON valide au format suivant :  
 
 
-
 `,
 
  // prompt 4:
 
-`,
 
-
-    `
-
-
+`
 
 Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
 
@@ -673,19 +661,12 @@ Instructions importantes :
 - Répondre strictement en JSON valide au format suivant :  
 
 
-
 `,
 
 
+// prompt 5:    
 
-// prompt 5:
-
-`,
-
-
-    `
-
-
+`
 
 Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
 
@@ -706,8 +687,6 @@ Instructions importantes :
 - Générer les tags en fonction de la langue de l'article (exemple : "Nomination", "PDG", "Industrie").  
 - Répondre strictement en JSON valide au format suivant :  
  
-
-
 
 `,
 

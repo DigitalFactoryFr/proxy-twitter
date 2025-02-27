@@ -570,7 +570,28 @@ Récupérez les articles de presse et articles de blog publiés le ${formattedDa
 - Investissements majeurs dans l’industrie (expansion d’usines, nouveaux projets).  
 - Fonds d’investissement spécialisés dans l’industrie et leur impact sur le secteur.  
 - Startups industrielles ayant levé des fonds : montants levés, investisseurs impliqués, objectifs des financements.  
-- Subventions gouvernementales ou aides financières pour l'innovation industrielle.  
+- Subventions gouvernementales ou aides financières pour l'innovation industrielle.
+- Fusions et acquisitions dans l’industrie (entreprises industrielles, startups, fournisseurs).  
+- Partenariats stratégiques entre entreprises industrielles et startups.  
+- Grandes entreprises industrielles rachetant des solutions SaaS, IoT ou IA.  
+- Joint-ventures et alliances stratégiques pour l’innovation industrielle.  
+- Impact des acquisitions sur les marchés et la concurrence industrielle.
+- Lancements de nouveaux équipements industriels.  
+- Déploiement de nouvelles applications logicielles pour l’industrie (SaaS, ERP, MES, etc.).  
+- Nouvelles technologies intégrées dans les processus industriels (IA, IoT, robotique).  
+- Présentation de nouveaux matériaux et procédés de fabrication avancés.  
+- Innovations technologiques qui transforment les lignes de production et la logistique.
+- Lancements de nouveaux équipements industriels.  
+- Salons industriels internationaux (Hannover Messe, CES, Industrie Paris, etc.).  
+- Conférences spécialisées dans l’innovation et l’Industrie 4.0.  
+- Annonces et nouveautés dévoilées lors de ces événements.  
+- Forums et rendez-vous B2B importants dans l’industrie manufacturière.  
+- Présentations de startups et nouvelles technologies lors des événements.
+- Annonce de nouveaux PDG ou directeurs industriels.  
+- Changements stratégiques au sein des grandes entreprises manufacturières.  
+- Départs, recrutements et promotions dans les entreprises du secteur.  
+- Impact de ces nominations sur les stratégies d’entreprise.  
+- Profils des nouveaux dirigeants et leurs parcours.   
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
@@ -584,117 +605,6 @@ Instructions importantes :
 - Répondre strictement en JSON valide au format suivant :  
 
 `,
-
- // prompt 2:
-
-
- `
-
-Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
-
-- Fusions et acquisitions dans l’industrie (entreprises industrielles, startups, fournisseurs).  
-- Partenariats stratégiques entre entreprises industrielles et startups.  
-- Grandes entreprises industrielles rachetant des solutions SaaS, IoT ou IA.  
-- Joint-ventures et alliances stratégiques pour l’innovation industrielle.  
-- Impact des acquisitions sur les marchés et la concurrence industrielle.  
-
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Fusion", "Acquisition", "Partenariat industriel").  
-- Répondre strictement en JSON valide au format suivant :  
-
-
-`,
-
- // prompt 3:
-
-
-`
-
-Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
-
-- Lancements de nouveaux équipements industriels.  
-- Déploiement de nouvelles applications logicielles pour l’industrie (SaaS, ERP, MES, etc.).  
-- Nouvelles technologies intégrées dans les processus industriels (IA, IoT, robotique).  
-- Présentation de nouveaux matériaux et procédés de fabrication avancés.  
-- Innovations technologiques qui transforment les lignes de production et la logistique.  
-
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Nouveaux produits", "Technologie industrielle", "Automatisation").  
-- Répondre strictement en JSON valide au format suivant :  
-
-
-`,
-
- // prompt 4:
-
-
-`
-
-Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
-
-- Salons industriels internationaux (Hannover Messe, CES, Industrie Paris, etc.).  
-- Conférences spécialisées dans l’innovation et l’Industrie 4.0.  
-- Annonces et nouveautés dévoilées lors de ces événements.  
-- Forums et rendez-vous B2B importants dans l’industrie manufacturière.  
-- Présentations de startups et nouvelles technologies lors des événements.  
-
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Salon industriel", "Conférence", "Innovation industrielle").  
-- Répondre strictement en JSON valide au format suivant :  
-
-
-`,
-
-
-// prompt 5:    
-
-`
-
-Récupérez les articles de presse et articles de blog publiés le ${formattedDate}, sur les sujets suivants :  
-
-- Annonce de nouveaux PDG ou directeurs industriels.  
-- Changements stratégiques au sein des grandes entreprises manufacturières.  
-- Départs, recrutements et promotions dans les entreprises du secteur.  
-- Impact de ces nominations sur les stratégies d’entreprise.  
-- Profils des nouveaux dirigeants et leurs parcours.  
-
-Instructions importantes :  
-- Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
-- Exclure les articles qui ne correspondent pas aux critères de date.  
-- Tous les articles doivent être uniques (pas de doublons).  
-- Chaque article doit être traité uniquement dans sa langue d'origine.  
-- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".  
-- Générer les tags en fonction de la langue de l'article (exemple : "Nomination", "PDG", "Industrie").  
-- Répondre strictement en JSON valide au format suivant :  
- 
-
-`,
-
-
-
 
 
   ];
@@ -778,7 +688,6 @@ executeNewsPrompts();
 
 async function updateArticles() {
 
-console.log(`🔄 Exécution de updateArticles() à ${new Date().toISOString()}`);
 
 console.log("🔄 Mise à jour des articles en cours...");
 

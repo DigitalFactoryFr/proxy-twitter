@@ -1132,6 +1132,32 @@ async function fetchArticleImage(url) {
 }
 
 
+async function updateExistingArticlesImages() {
+  try {
+    // Récupère tous les articles dont le champ image est vide ou invalide
+    const articles = await Article.findAll({
+      where: {
+        image: ""  // ou utilisez une condition plus fine si nécessaire
+      }
+    });
+
+    for (const article of articles) {
+      console.log(`Mise à jour de l'image pour: ${article.title}`);
+      const imageUrl = await fetchArticleImage(article.url);
+      if (imageUrl) {
+        article.image = imageUrl;
+        await article.save();
+        console.log(`✅ Image mise à jour pour: ${article.title}`);
+      } else {
+        console.warn(`⚠️ Aucune image trouvée pour: ${article.title}`);
+      }
+    }
+  } catch (error) {
+    console.error("❌ Erreur lors de la mise à jour des images:", error.message);
+  }
+}
+
+
 // Lancer le serveur Express
 app.listen(PORT, () => {
     console.log(` Serveur en écoute sur http://localhost:${PORT}`);

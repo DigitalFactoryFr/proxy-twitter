@@ -1074,6 +1074,19 @@ async function updateExistingArticlesImages() {
 // comment updateExistingArticlesImages(); // Appel direct
 
 
+// Route API pour récupérer la dernière mise à jour de la base de données
+app.get("/api/last-update", async (req, res) => {
+  try {
+    // Utilise la méthode max sur le champ updatedAt pour obtenir la date la plus récente
+    const lastUpdate = await Article.max('updatedAt');
+    res.json({ lastUpdate });
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la dernière mise à jour :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+
 // Lancer le serveur Express
 app.listen(PORT, () => {
     console.log(` Serveur en écoute sur http://localhost:${PORT}`);

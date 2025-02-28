@@ -679,11 +679,7 @@ updateArticles();
 setInterval(updateArticles, 12 * 60 * 60 * 1000); // Actualisation toutes les 3 heures
 
 
-
-
-
-
-// 📌 Route API pour récupérer les articles en fonction de la langue de Shopify
+// 📢 Route API pour récupérer les articles avec filtres généraux
 
 app.get("/api/articles/shopify", async (req, res) => {
   try {
@@ -693,7 +689,7 @@ app.get("/api/articles/shopify", async (req, res) => {
       tag,
       source,
       company,
-	search, 
+      search,
       dateRange,
       startDate,
       endDate
@@ -705,39 +701,17 @@ app.get("/api/articles/shopify", async (req, res) => {
     // whereClause impose la langue
     let whereClause = { language };
 
-  // 🔎 1) Recherche partielle par mot-clé (titre, desc, tags)
-    if (search) {
-      const s = search.toLowerCase();
-      articles = articles.filter(a => {
-        const inTitle = a.title?.toLowerCase().includes(s);
-        const inDesc  = a.description?.toLowerCase().includes(s);
-        const inTags  = (a.tags || []).some(tag => tag.toLowerCase().includes(s));
-        return inTitle || inDesc || inTags;
-      });
-    }
-
-    // Filtre par tag
+    // 1) Filtre par tag exact
     if (tag) {
       whereClause.tags = { [Op.contains]: [tag] };
-
-
     }
 
-    // Filtre par source
+    // 2) Filtre par source (partiel, insensible à la casse)
     if (source) {
       whereClause.source = { [Op.iLike]: `%${source}%` };
     }
 
-
-      // 🔎 2) Recherche partielle par "company" (tableau)
-    if (company) {
-      const c = company.toLowerCase();
-      articles = articles.filter(a => {
-        return (a.companies || []).some(comp => comp.toLowerCase().includes(c));
-      });
-    }
-
-    // Gestion des dates
+    // 3) Gestion des dates (période)
     if (dateRange && dateRange !== "custom") {
       const now = new Date();
       let start = null;
@@ -749,7 +723,7 @@ app.get("/api/articles/shopify", async (req, res) => {
           break;
         }
         case "this_week": {
-          const dayOfWeek = now.getDay();
+          const dayOfWeek = now.getDay(); 
           const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
           start = new Date(now.setDate(diff));
           start.setHours(0, 0, 0, 0);
@@ -776,18 +750,42 @@ app.get("/api/articles/shopify", async (req, res) => {
       };
     }
 
-    // Requête
-    const articles = await Article.findAll({
+    // 4) Requête initiale : on récupère tous les articles correspondant au whereClause
+    let articles = await Article.findAll({
       where: whereClause,
-      order: [["date", "DESC"]], // plus récents en premier
+      order: [["date", "DESC"]]
     });
 
+    // 5) 🔎 Recherche partielle par mot-clé (titre, desc, tags)
+    if (search) {
+      const s = search.toLowerCase();
+      articles = articles.filter(a => {
+        const inTitle = a.title?.toLowerCase().includes(s);
+        const inDesc  = a.description?.toLowerCase().includes(s);
+        const inTags  = (a.tags || []).some(tagItem => tagItem.toLowerCase().includes(s));
+        return inTitle || inDesc || inTags;
+      });
+    }
+
+    // 6) 🔎 Recherche partielle par "company" (dans le tableau companies)
+    if (company) {
+      const c = company.toLowerCase();
+      articles = articles.filter(a => {
+        return (a.companies || []).some(comp => comp.toLowerCase().includes(c));
+      });
+    }
+
+    // 7) Retourner la liste finale
     res.json(articles);
+
   } catch (error) {
     console.error("❌ Erreur récupération articles Shopify :", error.message);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
+
+
 
 
 
@@ -1053,7 +1051,7 @@ async function updateExistingArticlesImages() {
   }
 }
 
-updateExistingArticlesImages(); // Appel direct
+// comment updateExistingArticlesImages(); // Appel direct
 
 
 // Lancer le serveur Express

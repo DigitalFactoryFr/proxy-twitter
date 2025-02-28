@@ -679,110 +679,7 @@ updateArticles();
 setInterval(updateArticles, 12 * 60 * 60 * 1000); // Actualisation toutes les 3 heures
 
 
-// 📢 Route API pour récupérer les articles avec filtres généraux
 
-app.get("/api/articles/shopify", async (req, res) => {
-  try {
-    // On récupère shopifyLang et autres filtres
-    const {
-      shopifyLang,
-      tag,
-      source,
-      company,
-      search,
-      dateRange,
-      startDate,
-      endDate
-    } = req.query;
-
-    // Langue par défaut = "en" si non spécifié
-    const language = shopifyLang || "en";
-
-    // whereClause impose la langue
-    let whereClause = { language };
-
-    // 1) Filtre par tag exact
-    if (tag) {
-      whereClause.tags = { [Op.contains]: [tag] };
-    }
-
-    // 2) Filtre par source (partiel, insensible à la casse)
-    if (source) {
-      whereClause.source = { [Op.iLike]: `%${source}%` };
-    }
-
-    // 3) Gestion des dates (période)
-    if (dateRange && dateRange !== "custom") {
-      const now = new Date();
-      let start = null;
-      let end = new Date();
-
-      switch (dateRange) {
-        case "today": {
-          start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-          break;
-        }
-        case "this_week": {
-          const dayOfWeek = now.getDay(); 
-          const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-          start = new Date(now.setDate(diff));
-          start.setHours(0, 0, 0, 0);
-          break;
-        }
-        case "this_month": {
-          start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
-          break;
-        }
-        case "this_year": {
-          start = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
-          break;
-        }
-      }
-
-      if (start) {
-        whereClause.date = { [Op.between]: [start, end] };
-      }
-    }
-
-    if (dateRange === "custom" && startDate && endDate) {
-      whereClause.date = {
-        [Op.between]: [ new Date(startDate), new Date(endDate) ]
-      };
-    }
-
-    // 4) Requête initiale : on récupère tous les articles correspondant au whereClause
-    let articles = await Article.findAll({
-      where: whereClause,
-      order: [["date", "DESC"]]
-    });
-
-    // 5) 🔎 Recherche partielle par mot-clé (titre, desc, tags)
-    if (search) {
-      const s = search.toLowerCase();
-      articles = articles.filter(a => {
-        const inTitle = a.title?.toLowerCase().includes(s);
-        const inDesc  = a.description?.toLowerCase().includes(s);
-        const inTags  = (a.tags || []).some(tagItem => tagItem.toLowerCase().includes(s));
-        return inTitle || inDesc || inTags;
-      });
-    }
-
-    // 6) 🔎 Recherche partielle par "company" (dans le tableau companies)
-    if (company) {
-      const c = company.toLowerCase();
-      articles = articles.filter(a => {
-        return (a.companies || []).some(comp => comp.toLowerCase().includes(c));
-      });
-    }
-
-    // 7) Retourner la liste finale
-    res.json(articles);
-
-  } catch (error) {
-    console.error("❌ Erreur récupération articles Shopify :", error.message);
-    res.status(500).json({ error: "Erreur serveur" });
-  }
-});
 
 
 
@@ -1155,6 +1052,8 @@ async function updateExistingArticlesImages() {
     console.error("❌ Erreur lors de la mise à jour des images:", error.message);
   }
 }
+
+updateExistingArticlesImages(); // Appel direct
 
 
 // Lancer le serveur Express

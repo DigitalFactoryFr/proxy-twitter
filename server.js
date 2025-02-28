@@ -565,12 +565,12 @@ async function executeNewsPrompts() {
 // 2e prompt : Fusions, acquisitions et alliances stratégiques
 
 `
-Récupérez les articles publiés le hier sur les opérations stratégiques dans l’industrie, ainsi que les autres actualités majeures du secteur.
+Récupérez les articles publiés le ${formattedDate} sur les opérations stratégiques dans l’industrie, ainsi que les autres actualités majeures du secteur.
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés hier.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -586,12 +586,12 @@ Instructions importantes :
 // 1st prompt: Strategic Operations in Industry  
 
 `
-Retrieve articles published on yesterday about strategic operations in the industry, as well as other major industry news.  
+Retrieve articles published on ${formattedDate} about strategic operations in the industry, as well as other major industry news.  
 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published yesterday.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  

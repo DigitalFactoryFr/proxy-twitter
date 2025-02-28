@@ -587,16 +587,6 @@ Instructions importantes :
   ];
 
 
-// Fonction pour récupérer l'image d'un article en cas d'absence d'URL d'image
-async function fetchArticleImage(url) {
-    try {
-        const response = await axios.get(url, { timeout: 10000 }); // Augmenter le timeout
-        return response.data.image || "https://digitalfactory.store/default-image.jpg";
-    } catch (error) {
-        console.warn(`⚠️ Impossible de récupérer l'image : ${error.message}`);
-        return "https://digitalfactory.store/default-image.jpg"; // Image par défaut
-    }
-}
 
   // Parcourir chaque prompt et traiter la réponse avant de passer au suivant
   for (let i = 0; i < prompts.length; i++) {
@@ -1119,7 +1109,7 @@ async function isUrlValid(url) {
 
 async function fetchArticleImage(url) {
     try {
-        const { data } = await axios.get(url, { timeout: 5000 });
+        const { data } = await axios.get(url, { timeout: 10000 });
         const $ = cheerio.load(data);
         let imageUrl = $('meta[property="og:image"]').attr('content') || 
                        $('meta[name="twitter:image"]').attr('content');

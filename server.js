@@ -1106,40 +1106,49 @@ async function isUrlValid(url) {
 //2️⃣ Extraire l'image principale de l'article
 
 
-
+// Exemple de fonction d'extraction d'image avec Cheerio
 async function fetchArticleImage(url) {
-    try {
-        const { data } = await axios.get(url, { timeout: 10000 });
-        const $ = cheerio.load(data);
-        let imageUrl = $('meta[property="og:image"]').attr('content') || 
-                       $('meta[name="twitter:image"]').attr('content');
+  try {
+    const { data } = await axios.get(url, { timeout: 10000 });
+    const $ = cheerio.load(data);
+    const imageUrl =
+      $('meta[property="og:image"]').attr('content') ||
+      $('meta[name="twitter:image"]').attr('content');
 
-        return imageUrl || ""; // Retourne une image si trouvée, sinon une chaîne vide
-    } catch (error) {
-        console.error("❌ Impossible de récupérer l'image :", error.message);
-        return "";
-    }
+    // Retourne l'URL trouvée, sinon chaîne vide
+    return imageUrl || "";
+  } catch (error) {
+    console.error("❌ Impossible de récupérer l'image :", error.message);
+    return "";
+  }
 }
 
-
+// Fonction pour mettre à jour les articles qui ont l'image par défaut
 async function updateExistingArticlesImages() {
   try {
-    // Récupère tous les articles dont le champ image est vide ou invalide
+    // Récupère tous les articles dont l'image est encore celle par défaut
     const articles = await Article.findAll({
       where: {
-        image: "https://digitalfactory.store/default-image.jpg"  // ou utilisez une condition plus fine si nécessaire
+        image: "https://digitalfactory.store/default-image.jpg"
       }
     });
 
     for (const article of articles) {
-      console.log(`Mise à jour de l'image pour: ${article.title}`);
+      console.log(`🔄 Mise à jour de l'image pour: ${article.title}`);
+      
+      // Extraction de la vraie URL d'image
       const imageUrl = await fetchArticleImage(article.url);
+
       if (imageUrl) {
+        // Si une image est trouvée, on l’enregistre
         article.image = imageUrl;
         await article.save();
         console.log(`✅ Image mise à jour pour: ${article.title}`);
       } else {
-        console.warn(`⚠️ Aucune image trouvée pour: ${article.title}`);
+        // Si aucune image n'est trouvée, on met la colonne à vide
+        article.image = "";
+        await article.save();
+        console.warn(`⚠️ Aucune image trouvée pour: ${article.title}, champ mis à ""`);
       }
     }
   } catch (error) {

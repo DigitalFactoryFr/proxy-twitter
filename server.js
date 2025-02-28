@@ -899,7 +899,11 @@ Critères stricts : L'article doit obligatoirement respecter tous ces critères 
     - Événements sectoriels (automobile, aérospatial, supply chain, maintenance prédictive, robotisation).
     - Et autres actualités majeures du secteur industriel.
 
-    Retournez uniquement les informations sous format JSON strictement valide :
+Instructions importantes :
+- Générer les tags en fonction de la langue de l'article (exemple : "Investissement", "Startup industrielle", "Industrie 4.0").
+- Chaque article doit être traité uniquement dans sa langue d'origine.  
+- Extraire les noms des entreprises mentionnées dans les articles et les lister dans le champ "companies".       
+- Retournez uniquement les informations sous format JSON strictement valide :
 
     {
       "title": "Titre de l'article",
@@ -909,7 +913,7 @@ Critères stricts : L'article doit obligatoirement respecter tous ces critères 
       "date": "YYYY-MM-DD HH:mm:ss",
       "source": "Nom du site",
       "url": "${url}",
-      "language": "fr",
+      "language": "...",
       "companies": ["Entreprise1", "Entreprise2"],
       "pertinence_score": 8
     }
@@ -1071,7 +1075,7 @@ async function updateExistingArticlesImages() {
   }
 }
 
-// comment updateExistingArticlesImages(); // Appel direct
+updateExistingArticlesImages(); // Appel direct
 
 
 // Route API pour récupérer la dernière mise à jour de la base de données

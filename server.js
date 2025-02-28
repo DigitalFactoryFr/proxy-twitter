@@ -1137,7 +1137,7 @@ async function updateExistingArticlesImages() {
     // Récupère tous les articles dont le champ image est vide ou invalide
     const articles = await Article.findAll({
       where: {
-        image: ""  // ou utilisez une condition plus fine si nécessaire
+        image: "https://digitalfactory.store/default-image.jpg"  // ou utilisez une condition plus fine si nécessaire
       }
     });
 

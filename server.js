@@ -586,7 +586,7 @@ Instructions importantes :
 // 1st prompt: Strategic Operations in Industry  
 
 `
-Retrieve articles published on ${formattedDate} about strategic operations in the industry, as well as other major industry news.  
+Retrieve articles and news published on ${formattedDate} related to the industrial sector.  
 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  

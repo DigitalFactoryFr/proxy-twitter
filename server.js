@@ -884,7 +884,7 @@ Analysez l'article provenant de cette URL : ${url}.
     
 Critères stricts : L'article doit obligatoirement respecter tous ces critères :
 
-  - Doit avoir été publié dans les 30 derniers jours (rejeter si la date n'est pas claire ou trop ancienne).
+
   - Issu d'une source fiable : Presse économique, blogs spécialisés, médias d'analyse industrielle.
   - L'article doit couvrir l'un des sujets suivants :
     - Levées de fonds industrielles (startups et entreprises industrielles).
@@ -970,7 +970,7 @@ Instructions importantes :
       articleDate.getMonth() !== today.getMonth()
     ) {
       return res.status(400).json({
-        message: "❌ L'article n'est pas récent (doit être publié ce mois-ci).",
+        message: "❌ L'article n'est pas récent.",
         rawResponse: rawResponse
       });
     }

@@ -1005,8 +1005,6 @@ if (!relevant) {
     rawResponse: rawResponse
   });
 }
-*/
-
 
 
     if (!relevant) {
@@ -1015,6 +1013,8 @@ if (!relevant) {
         rawResponse: rawResponse
       });
     }
+
+*/
 
     // Vérifier si l'article existe déjà en base
     const [article, created] = await Article.findOrCreate({

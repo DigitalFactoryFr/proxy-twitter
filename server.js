@@ -978,7 +978,10 @@ if (differenceInDays > 30) {
 }
 
 
-   // Vérification de la pertinence industrielle
+ 
+/*
+🏭 Vérification de la pertinence industrielle
+
 const industrialKeywords = [
   "industrie", "usine", "supply chain", "robotique", "automatisation",
   "manufacturing", "industrie 4.0", "maintenance", "numérique",
@@ -987,20 +990,23 @@ const industrialKeywords = [
   "smart factory", "gestion industrielle", "machine learning", "usine intelligente"
 ];
 
-// Création d'une expression régulière insensible à la casse pour capturer les variantes lexicales
+// 🔍 Création d'une expression régulière insensible à la casse (permet de capter toutes les variantes lexicales)
 const regexPattern = new RegExp(industrialKeywords.join("|"), "i");
 
-// Vérification de la pertinence sur le titre, la description et, si disponible, le contenu de l’article
-const relevant = regexPattern.test(parsedResponse.title) ||
-                 regexPattern.test(parsedResponse.description) ||
-                 (parsedResponse.content && regexPattern.test(parsedResponse.content));
+// ✅ Vérification de la pertinence de l'article en analysant son titre, sa description et (si disponible) son contenu complet
+const relevant = regexPattern.test(parsedResponse.title) ||   // Vérifie dans le titre
+                 regexPattern.test(parsedResponse.description) || // Vérifie dans la description
+                 (parsedResponse.content && regexPattern.test(parsedResponse.content)); // Vérifie dans le contenu de l’article s’il existe
 
+// 🚨 Si aucun mot-clé industriel n'est trouvé, l'article est rejeté
 if (!relevant) {
   return res.status(400).json({
     message: "❌ L'article ne traite pas d'un sujet industriel.",
     rawResponse: rawResponse
   });
 }
+*/
+
 
 
     if (!relevant) {

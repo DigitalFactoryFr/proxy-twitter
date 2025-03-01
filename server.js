@@ -884,7 +884,7 @@ Analysez l'article provenant de cette URL : ${url}.
     
 Critères stricts : L'article doit obligatoirement respecter tous ces critères :
 
-
+  - Doit avoir été publié dans les 30 derniers jours (rejeter si la date n'est pas claire ou trop ancienne).
   - Issu d'une source fiable : Presse économique, blogs spécialisés, médias d'analyse industrielle.
   - L'article doit couvrir l'un des sujets suivants :
     - Levées de fonds industrielles (startups et entreprises industrielles).
@@ -962,18 +962,21 @@ Instructions importantes :
       });
     }
 
-    // Vérification de la récence de l’article
-    const articleDate = new Date(parsedResponse.date);
-    const today = new Date();
-    if (
-      articleDate.getFullYear() !== today.getFullYear() ||
-      articleDate.getMonth() !== today.getMonth()
-    ) {
-      return res.status(400).json({
-        message: "❌ L'article n'est pas récent.",
-        rawResponse: rawResponse
-      });
-    }
+// Vérification de la récence de l’article (publié dans les 30 derniers jours)
+const articleDate = new Date(parsedResponse.date);
+const today = new Date();
+
+// Calcul de la différence en jours
+const differenceInTime = today.getTime() - articleDate.getTime();
+const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+
+if (differenceInDays > 30) {
+  return res.status(400).json({
+    message: "❌ L'article n'est pas récent (plus de 30 jours).",
+    rawResponse: rawResponse
+  });
+}
+
 
     // Vérification de la pertinence industrielle
     const industrialKeywords = ["industrie", "usine", "supply chain", "robotique", "automatisation", "manufacturing", "industrie 4.0"];

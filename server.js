@@ -566,7 +566,7 @@ async function executeNewsPrompts() {
 // 2e prompt : Fusions, acquisitions et alliances stratégiques
 
 `
-Récupérez les articles publiés le ${formattedDate} sur sur les actualités du secteur industriel.
+Récupérez les derniers articles publiés le ${formattedDate} sur les actualités du secteur industriel en priorité, suivies des évolutions et innovations liées à l'Industrie 4.0 et 5.0 (projets, innovations, événements).
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
@@ -619,6 +619,7 @@ Récupérez les articles publiés le ${formattedDate} sur les nouvelles technolo
 - Innovations impactant les lignes de production et la logistique. 
 - Construction de nouvelles usines (ex. gigafactories), projets industriels d’envergure, innovations technologiques, investissements stratégiques et autres actualités clés dans le domaines industriels.
 
+
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
@@ -664,7 +665,7 @@ Récupérez les articles publiés le ${formattedDate} sur les changements de dir
 - Annonce de nouveaux PDG ou directeurs industriels.  
 - Changements stratégiques dans les grandes entreprises manufacturières.  
 - Départs, recrutements et promotions dans les entreprises du secteur inidustriel.  
-- Impact des nominations sur les stratégies d’entreprise.  
+
 
  
 Instructions importantes :  
@@ -713,7 +714,8 @@ Récupérez les articles publiés le ${formattedDate} sur l’Internet des objet
 - Impact de la 5G sur la connectivité industrielle.  
 - Déploiement de solutions de gestion IoT dans les sites de production.  
 - Startups développant des plateformes IoT pour l’industrie.  
-- Technologies de monitoring et analyse des données IoT.  
+- Technologies de monitoring et analyse des données IoT. 
+- Application de l'intelligence artificielle dans le secteur indsutriel 
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
@@ -1218,13 +1220,20 @@ app.post("/api/submit-article", async (req, res) => {
     return res.status(400).json({ message: "❌ L'URL semble invalide ou inaccessible." });
   }
 
+const today = new Date();
+const thirtyDaysAgo = new Date();
+thirtyDaysAgo.setDate(today.getDate() - 30);
+
+const formattedToday = today.toISOString().split("T")[0]; // Format YYYY-MM-DD
+const formattedThirtyDaysAgo = thirtyDaysAgo.toISOString().split("T")[0]; // Format YYYY-MM-DD
+
   // On construit le prompt
   const prompt = `
 Analysez l'article provenant de cette URL : ${url}.
     
 Critères stricts : L'article doit obligatoirement respecter tous ces critères :
 
-  - Doit avoir été publié dans les 30 derniers jours (rejeter si la date n'est pas claire ou trop ancienne).
+  - Doit avoir été publié entre ${formattedThirtyDaysAgo} et ${formattedToday}.
   - Issu d'une source fiable : Presse économique, blogs spécialisés, médias d'analyse industrielle.
   - L'article doit couvrir l'un des sujets suivants :
     - Levées de fonds industrielles (startups et entreprises industrielles).
@@ -1253,7 +1262,7 @@ Instructions importantes :
       "date": "YYYY-MM-DD HH:mm:ss",
       "source": "Nom du site",
       "url": "${url}",
-      "language": "...",
+      "language": ["fr", "en"],
       "companies": ["Entreprise1", "Entreprise2"],
       "pertinence_score": 8
     }

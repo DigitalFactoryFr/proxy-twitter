@@ -1262,7 +1262,7 @@ Instructions importantes :
       "date": "YYYY-MM-DD HH:mm:ss",
       "source": "Nom du site",
       "url": "${url}",
-      "language": ["fr", "en"],
+      "language": "...",
       "companies": ["Entreprise1", "Entreprise2"],
       "pertinence_score": 8
     }

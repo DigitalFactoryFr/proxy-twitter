@@ -566,7 +566,7 @@ async function executeNewsPrompts() {
 // 2e prompt : Fusions, acquisitions et alliances stratégiques
 
 `
-Récupérez les articles publiés le ${formattedDate} sur les opérations stratégiques dans l’industrie, ainsi que les autres actualités majeures du secteur.
+Récupérez les articles publiés le ${formattedDate} sur sur les actualités du secteur industriel.
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
@@ -1030,7 +1030,11 @@ await deleteInvalidArticles(); // 🔥 Nettoie les articles avec des URLs non va
 updateArticles();
 
 // 🔄 Puis répéter toutes les 12 heures
-setInterval(updateArticles, 12 * 60 * 60 * 1000); // Actualisation toutes les 3 heures
+setInterval(() => {
+    console.log(`🕒 Exécution de updateArticles() à ${new Date().toISOString()}`);
+    updateArticles();
+}, 12 * 60 * 60 * 1000);
+
 
 
 // 📢 Route API pour récupérer les articles avec filtres généraux

@@ -468,7 +468,7 @@ async function sendPrompt(topicText) {
       "date": "YYYY-MM-DD HH:mm:ss",
       "source": "...",
       "url": "...",
-      "language": "...",
+      "language": ["fr", "en"],
       "companies": ["...", "..."]
     }
   ]
@@ -539,7 +539,7 @@ async function sendPrompt(topicText) {
   }
 }
 
-
+/*
 // 🔄 Fonction qui enchaîne plusieurs prompts séquentiellement
 async function executeNewsPrompts() {
    // Calcul de la date et de la plage horaire
@@ -1024,7 +1024,7 @@ await deleteInvalidArticles(); // 🔥 Nettoie les articles avec des URLs non va
  console.log("✅ Nettoyage des articles terminé !");
 }
 
-
+*/
 
 // 🏁 Appeler la première fois immédiatement
 updateArticles();

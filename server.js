@@ -539,7 +539,7 @@ async function sendPrompt(topicText) {
   }
 }
 
-/*
+
 // 🔄 Fonction qui enchaîne plusieurs prompts séquentiellement
 async function executeNewsPrompts() {
    // Calcul de la date et de la plage horaire
@@ -1037,7 +1037,7 @@ setInterval(() => {
     updateArticles();
 }, 12 * 60 * 60 * 1000);
 
-*/
+
 
 // 📢 Route API pour récupérer les articles avec filtres généraux
 

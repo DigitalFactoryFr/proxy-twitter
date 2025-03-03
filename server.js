@@ -468,7 +468,7 @@ async function sendPrompt(topicText) {
       "date": "YYYY-MM-DD HH:mm:ss",
       "source": "...",
       "url": "...",
-      "language": ["fr", "en"],
+      "language": "fr", "en",
       "companies": ["...", "..."]
     }
   ]

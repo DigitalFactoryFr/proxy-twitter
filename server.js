@@ -429,6 +429,7 @@ async function getExistingArticles() {
 }
 
 
+/*
 
 // 🔥 Fonction générique pour envoyer un prompt à Perplexity API
 async function sendPrompt(topicText) {
@@ -542,7 +543,7 @@ async function sendPrompt(topicText) {
 }
 
 
-/*
+
 
 // 🔄 Fonction qui enchaîne plusieurs prompts séquentiellement
 async function executeNewsPrompts() {

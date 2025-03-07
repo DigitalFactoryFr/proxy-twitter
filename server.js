@@ -429,7 +429,7 @@ async function getExistingArticles() {
 }
 
 
-/*
+
 
 // 🔥 Fonction générique pour envoyer un prompt à Perplexity API
 async function sendPrompt(topicText) {
@@ -1041,7 +1041,7 @@ setInterval(() => {
     updateArticles();
 }, 12 * 60 * 60 * 1000);
 
-*/
+
 
 // 📢 Route API pour récupérer les articles avec filtres généraux
 

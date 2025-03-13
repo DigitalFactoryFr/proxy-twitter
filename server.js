@@ -429,7 +429,6 @@ async function getExistingArticles() {
 }
 
 
-/*
 
 // 🔥 Fonction générique pour envoyer un prompt à Perplexity API
 async function sendPrompt(topicText) {
@@ -569,16 +568,15 @@ async function executeNewsPrompts() {
 
 
 
-
 // 2e prompt : Fusions, acquisitions et alliances stratégiques
 
 `
-Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur les opérations stratégiques dans l’industrie, ainsi que les autres actualités majeures du secteur.
+Récupérez les articles publiés le ${formattedDate} sur les opérations stratégiques dans l’industrie, ainsi que les autres actualités majeures du secteur.
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés entre le 08 mars 2025 et le 12 mars 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -594,7 +592,7 @@ Instructions importantes :
 // 2e prompt : Fusions, acquisitions et alliances stratégiques
 
 `
-Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur les opérations stratégiques dans l’industrie :  
+Récupérez les articles publiés le ${formattedDate} sur les opérations stratégiques dans l’industrie :  
 
 - Fusions et acquisitions d’entreprises industrielles et fournisseurs.  
 - Partenariats stratégiques entre entreprises et startups industrielles.  
@@ -604,7 +602,7 @@ Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur l
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés entre le 08 mars 2025 et le 12 mars 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -617,7 +615,7 @@ Instructions importantes :
 // 3e prompt : Innovations technologiques et transformation digitale
 
 `
-Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur les nouvelles technologies dans l’industrie :  
+Récupérez les articles publiés le ${formattedDate} sur les nouvelles technologies dans l’industrie :  
 
 - Lancements de nouveaux équipements industriels majeurs, tels que les nouvelles générations d’avions (ex. Airbus A350 Neo), de véhicules électriques révolutionnaires (ex. Tesla Cybertruck), de machines de production avancées (ex. robots industriels collaboratifs), ou d’innovations technologiques de rupture. 
 - Déploiement d’applications logicielles pour l’industrie (SaaS, ERP, MES).  
@@ -629,7 +627,7 @@ Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur l
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés entre le 08 mars 2025 et le 12 mars 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -642,7 +640,7 @@ Instructions importantes :
 // 4e prompt : Événements industriels et salons professionnels
 
 `
-Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur les événements du secteur industriel :  
+Récupérez les articles publiés le ${formattedDate} sur les événements du secteur industriel :  
 
 - Salons industriels internationaux (Hannover Messe, CES, Industrie Paris, etc.).  
 - Conférences spécialisées en innovation et Industrie 4.0.  
@@ -653,7 +651,7 @@ Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur l
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés entre le 08 mars 2025 et le 12 mars 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -666,7 +664,7 @@ Instructions importantes :
 // 5e prompt : Nominations et gestion des talents industriels
 
 `
-Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur les changements de direction dans l’industrie :  
+Récupérez les articles publiés le ${formattedDate} sur les changements de direction dans l’industrie :  
 
 - Annonce de nouveaux PDG ou directeurs industriels.  
 - Changements stratégiques dans les grandes entreprises manufacturières.  
@@ -677,7 +675,7 @@ Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur l
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés entre le 08 mars 2025 et le 12 mars 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -690,7 +688,7 @@ Instructions importantes :
 // 6e prompt : Cybersécurité et protection des données industrielles
 
 `
-Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur la cybersécurité dans l’industrie :  
+Récupérez les articles publiés le ${formattedDate} sur la cybersécurité dans l’industrie :  
 
 - Menaces récentes de cyberattaques sur les systèmes industriels.  
 - Nouveaux outils et solutions de cybersécurité pour l’Industrie 4.0.  
@@ -701,7 +699,7 @@ Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur l
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés entre le 08 mars 2025 et le 12 mars 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -714,7 +712,7 @@ Instructions importantes :
 // 7e prompt : IoT industriel et connectivité avancée
 
 `
-Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur l’Internet des objets dans l’industrie :  
+Récupérez les articles publiés le ${formattedDate} sur l’Internet des objets dans l’industrie :  
 
 - Nouveaux capteurs et équipements IoT pour les usines.  
 - Impact de la 5G sur la connectivité industrielle.  
@@ -725,7 +723,7 @@ Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur l
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés entre le 08 mars 2025 et le 12 mars 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -738,7 +736,7 @@ Instructions importantes :
 // 8e prompt : Développement durable et transition énergétique
 
 `
-Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur la durabilité industrielle :  
+Récupérez les articles publiés le ${formattedDate} sur la durabilité industrielle :  
 
 - Solutions d’efficacité énergétique pour les usines.  
 - Adoption des énergies renouvelables dans les sites industriels.  
@@ -749,7 +747,7 @@ Récupérez les articles publiés entre le 08 mars 2025 et le 12 mars 2025 sur l
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés entre le 08 mars 2025 et le 12 mars 2025.  
+- Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -763,12 +761,12 @@ Instructions importantes :
 // 1st prompt: Strategic Operations in Industry  
 
 `
-Retrieve articles published Published between March 8, 2025, and March 12, 2025 about strategic operations in the industry, as well as other major industry news.  
+Retrieve articles published on ${formattedDate} about strategic operations in the industry, as well as other major industry news.  
 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published Published between March 8, 2025, and March 12, 2025.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -781,7 +779,7 @@ Important Instructions:
 // 2nd prompt: Mergers, Acquisitions, and Strategic Alliances  
 
 `
-Retrieve articles published Published between March 8, 2025, and March 12, 2025 about strategic operations in the industry:  
+Retrieve articles published on ${formattedDate} about strategic operations in the industry:  
 
 - Mergers and acquisitions of industrial companies and suppliers.  
 - Strategic partnerships between industrial enterprises and startups.  
@@ -791,7 +789,7 @@ Retrieve articles published Published between March 8, 2025, and March 12, 2025 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published Published between March 8, 2025, and March 12, 2025.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -804,7 +802,7 @@ Important Instructions:
 // 3rd prompt: Technological Innovations and Digital Transformation  
 
 `
-Retrieve articles published Published between March 8, 2025, and March 12, 2025 about new technologies in the industry:  
+Retrieve articles published on ${formattedDate} about new technologies in the industry:  
 
 - Launch of major new industrial equipment, such as next-generation aircraft (e.g., Airbus A350 Neo), revolutionary electric vehicles (e.g., Tesla Cybertruck), advanced manufacturing machines (e.g., collaborative industrial robots), or disruptive technological innovations.  
 - Deployment of industrial software applications (SaaS, ERP, MES).  
@@ -816,7 +814,7 @@ Retrieve articles published Published between March 8, 2025, and March 12, 2025 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published Published between March 8, 2025, and March 12, 2025.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -829,7 +827,7 @@ Important Instructions:
 // 4th prompt: Industrial Events and Trade Shows  
 
 `
-Retrieve articles published Published between March 8, 2025, and March 12, 2025 about industrial events:  
+Retrieve articles published on ${formattedDate} about industrial events:  
 
 - International industrial trade shows (Hannover Messe, CES, Industrie Paris, etc.).  
 - Specialized conferences on innovation and Industry 4.0.  
@@ -840,7 +838,7 @@ Retrieve articles published Published between March 8, 2025, and March 12, 2025 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published Published between March 8, 2025, and March 12, 2025.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -853,7 +851,7 @@ Important Instructions:
 // 5th prompt: Executive Appointments and Talent Management in Industry  
 
 `
-Retrieve articles published Published between March 8, 2025, and March 12, 2025 about leadership changes in the industry:  
+Retrieve articles published on ${formattedDate} about leadership changes in the industry:  
 
 - Announcement of new CEOs or industrial directors.  
 - Strategic shifts in major manufacturing companies.  
@@ -863,7 +861,7 @@ Retrieve articles published Published between March 8, 2025, and March 12, 2025 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published Published between March 8, 2025, and March 12, 2025.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -876,7 +874,7 @@ Important Instructions:
 // 6th prompt: Cybersecurity and Data Protection in Industry  
 
 `
-Retrieve articles published Published between March 8, 2025, and March 12, 2025 about cybersecurity in the industry:  
+Retrieve articles published on ${formattedDate} about cybersecurity in the industry:  
 
 - Recent cyber threats targeting industrial systems.  
 - New cybersecurity tools and solutions for Industry 4.0.  
@@ -887,7 +885,7 @@ Retrieve articles published Published between March 8, 2025, and March 12, 2025 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published Published between March 8, 2025, and March 12, 2025.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -900,7 +898,7 @@ Important Instructions:
 // 7th prompt: Industrial IoT and Advanced Connectivity  
 
 `
-Retrieve articles published Published between March 8, 2025, and March 12, 2025 about the Internet of Things in industry:  
+Retrieve articles published on ${formattedDate} about the Internet of Things in industry:  
 
 - New sensors and IoT equipment for factories.  
 - Impact of 5G on industrial connectivity.  
@@ -911,7 +909,7 @@ Retrieve articles published Published between March 8, 2025, and March 12, 2025 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published Published between March 8, 2025, and March 12, 2025.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -924,7 +922,7 @@ Important Instructions:
 // 8th prompt: Sustainability and Energy Transition in Industry  
 
 `
-Retrieve articles published Published between March 8, 2025, and March 12, 2025 about industrial sustainability:  
+Retrieve articles published on ${formattedDate} about industrial sustainability:  
 
 - Energy efficiency solutions for factories.  
 - Adoption of renewable energy in industrial sites.  
@@ -935,7 +933,7 @@ Retrieve articles published Published between March 8, 2025, and March 12, 2025 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published Published between March 8, 2025, and March 12, 2025.  
+- Return only articles published on ${formattedDate}.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -1042,7 +1040,6 @@ setInterval(() => {
     updateArticles();
 }, 12 * 60 * 60 * 1000);
 
-*/
 
 // 📢 Route API pour récupérer les articles avec filtres généraux
 

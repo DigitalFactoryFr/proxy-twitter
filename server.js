@@ -578,7 +578,8 @@ Récupérez les articles publiés le ${formattedDate} sur les actualités majeur
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.
+- Ne générer aucun article fictif ni lien inventé. Seuls les articles réellement publiés sont acceptés.  
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
@@ -604,7 +605,8 @@ Récupérez les articles publiés le ${formattedDate} sur les opérations strat�
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.
+- Ne générer aucun article fictif ni lien inventé. Seuls les articles réellement publiés sont acceptés.
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
@@ -631,6 +633,7 @@ Récupérez les articles publiés le ${formattedDate} sur les nouvelles technolo
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Ne générer aucun article fictif ni lien inventé. Seuls les articles réellement publiés sont acceptés.  
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
@@ -654,7 +657,8 @@ Récupérez les articles publiés le ${formattedDate} sur les événements du se
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.
+- Ne générer aucun article fictif ni lien inventé. Seuls les articles réellement publiés sont acceptés.    
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
@@ -678,7 +682,8 @@ Récupérez les articles publiés le ${formattedDate} sur les changements de dir
  
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
-- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide. 
+- Ne générer aucun article fictif ni lien inventé. Seuls les articles réellement publiés sont acceptés.   
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
@@ -703,6 +708,7 @@ Récupérez les articles publiés le ${formattedDate} sur la cybersécurité dan
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Ne générer aucun article fictif ni lien inventé. Seuls les articles réellement publiés sont acceptés.  
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
@@ -727,6 +733,7 @@ Récupérez les articles publiés le ${formattedDate} sur l’Internet des objet
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Ne générer aucun article fictif ni lien inventé. Seuls les articles réellement publiés sont acceptés.  
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
@@ -751,6 +758,7 @@ Récupérez les articles publiés le ${formattedDate} sur la durabilité industr
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
+- Ne générer aucun article fictif ni lien inventé. Seuls les articles réellement publiés sont acceptés.  
 - Retourner uniquement les articles publiés le ${formattedDate}.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  

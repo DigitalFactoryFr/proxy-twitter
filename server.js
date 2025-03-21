@@ -29,10 +29,10 @@ app.use(express.urlencoded({ extended: true }));
 // Configuration CORS
 app.use(cors({ origin: "*" }));
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
 });
 
 // Vérification des variables d'environnement
@@ -51,53 +51,53 @@ console.log(" PERPLEXITY_API_KEY:", process.env.PERPLEXITY_API_KEY ? "OK" : "NON
 
 // Route principale Twitter
 app.get("/twitter/:username", async (req, res) => {
-  const username = req.params.username;
-  const url = `https://api.twitter.com/2/users/by/username/${username}?user.fields=public_metrics`;
+  const username = req.params.username;
+  const url = `https://api.twitter.com/2/users/by/username/${username}?user.fields=public_metrics`;
 
-  try {
+  try {
 
 console.log(" Bearer Token utilisé :", process.env.BEARER_TOKEN);
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${BEARER_TOKEN}`,
-        "Content-Type": "application/json"
-      }
-    });
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${BEARER_TOKEN}`,
+        "Content-Type": "application/json"
+      }
+    });
 
-    const data = await response.json();
-    if (data.data) {
-      res.json({
-        id: data.data.id,
-        name: data.data.name,
-        username: data.data.username,
-        abonnés: data.data.public_metrics.followers_count,
-      });
-    } else {
-      res.status(404).json({ error: "Utilisateur non trouvé" });
-    }
-  } catch (error) {
-    console.error(" Erreur API Twitter :", error);
-    res.status(500).json({ error: "Erreur serveur" });
-  }
+    const data = await response.json();
+    if (data.data) {
+      res.json({
+        id: data.data.id,
+        name: data.data.name,
+        username: data.data.username,
+        abonnés: data.data.public_metrics.followers_count,
+      });
+    } else {
+      res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+  } catch (error) {
+    console.error(" Erreur API Twitter :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 });
 
 
 // Route pour récupérer le Place ID Google
 app.get("/api/get-place-id", async (req, res) => {
-  const siteInternet = req.query.siteInternet;
-  if (!siteInternet) return res.status(400).json({ error: "URL requise" });
+  const siteInternet = req.query.siteInternet;
+  if (!siteInternet) return res.status(400).json({ error: "URL requise" });
 
-  try {
-    const placeSearchUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(siteInternet)}&inputtype=textquery&fields=name,place_id,formatted_address&key=${GOOGLE_API_KEY}`;
-    const response = await fetch(placeSearchUrl);
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error(" Erreur API Google :", error);
-    res.status(500).json({ error: "Erreur serveur Google." });
-  }
+  try {
+    const placeSearchUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(siteInternet)}&inputtype=textquery&fields=name,place_id,formatted_address&key=${GOOGLE_API_KEY}`;
+    const response = await fetch(placeSearchUrl);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error(" Erreur API Google :", error);
+    res.status(500).json({ error: "Erreur serveur Google." });
+  }
 });
 
 
@@ -110,100 +110,100 @@ app.get("/api/get-place-id", async (req, res) => {
 
 // Route pour récupérer les avis Google
 app.get("/api/get-reviews", async (req, res) => {
-  const placeId = req.query.placeId;
-  if (!placeId) return res.status(400).json({ error: "Place ID requis" });
+  const placeId = req.query.placeId;
+  if (!placeId) return res.status(400).json({ error: "Place ID requis" });
 
-  try {
-    const placeDetailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=name,reviews&key=${GOOGLE_API_KEY}`;
-    const response = await fetch(placeDetailsUrl);
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error(" Erreur API Google :", error);
-    res.status(500).json({ error: "Erreur serveur Google." });
-  }
+  try {
+    const placeDetailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&fields=name,reviews&key=${GOOGLE_API_KEY}`;
+    const response = await fetch(placeDetailsUrl);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error(" Erreur API Google :", error);
+    res.status(500).json({ error: "Erreur serveur Google." });
+  }
 });
 
 // Route pour récupérer les statistiques complètes de la chaîne YouTube
 app.get("/youtube-channel-info", async (req, res) => {
-    const channelHandle = req.query.channelHandle; // Ex: "@DigitalFactory"
-    if (!channelHandle) {
-        return res.status(400).json({ error: "Handle de chaîne requis (ex: @DigitalFactory)" });
-    }
+    const channelHandle = req.query.channelHandle; // Ex: "@DigitalFactory"
+    if (!channelHandle) {
+        return res.status(400).json({ error: "Handle de chaîne requis (ex: @DigitalFactory)" });
+    }
 
-    try {
-        console.log(` Recherche des infos pour la chaîne YouTube : ${channelHandle}`);
+    try {
+        console.log(` Recherche des infos pour la chaîne YouTube : ${channelHandle}`);
 
-        // Récupérer l'ID de la chaîne via le handle YouTube
-        const handleUrl = `https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${channelHandle}&key=${GOOGLE_API_KEY}`;
-        const handleResponse = await fetch(handleUrl);
-        const handleData = await handleResponse.json();
+        // Récupérer l'ID de la chaîne via le handle YouTube
+        const handleUrl = `https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${channelHandle}&key=${GOOGLE_API_KEY}`;
+        const handleResponse = await fetch(handleUrl);
+        const handleData = await handleResponse.json();
 
-        if (!handleData.items || handleData.items.length === 0) {
-            return res.status(404).json({ error: "Aucune chaîne trouvée pour ce handle." });
-        }
+        if (!handleData.items || handleData.items.length === 0) {
+            return res.status(404).json({ error: "Aucune chaîne trouvée pour ce handle." });
+        }
 
-        const channelId = handleData.items[0].id;
-        console.log(` ID de la chaîne trouvé : ${channelId}`);
+        const channelId = handleData.items[0].id;
+        console.log(` ID de la chaîne trouvé : ${channelId}`);
 
-        // Récupérer les statistiques de la chaîne (abonnés, vues, vidéos)
-        const statsUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${GOOGLE_API_KEY}`;
-        const statsResponse = await fetch(statsUrl);
-        const statsData = await statsResponse.json();
+        // Récupérer les statistiques de la chaîne (abonnés, vues, vidéos)
+        const statsUrl = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${GOOGLE_API_KEY}`;
+        const statsResponse = await fetch(statsUrl);
+        const statsData = await statsResponse.json();
 
-        if (!statsData.items || statsData.items.length === 0) {
-            return res.status(404).json({ error: "Impossible de récupérer les stats de la chaîne." });
-        }
+        if (!statsData.items || statsData.items.length === 0) {
+            return res.status(404).json({ error: "Impossible de récupérer les stats de la chaîne." });
+        }
 
-        const stats = statsData.items[0].statistics;
-        const subscribers = stats.subscriberCount;
-        const totalViews = stats.viewCount;
-        const totalVideos = stats.videoCount;
+        const stats = statsData.items[0].statistics;
+        const subscribers = stats.subscriberCount;
+        const totalViews = stats.viewCount;
+        const totalVideos = stats.videoCount;
 
-        // Récupérer la dernière vidéo publiée
-        const latestVideoUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&order=date&type=video&key=${GOOGLE_API_KEY}`;
-        const latestVideoResponse = await fetch(latestVideoUrl);
-        const latestVideoData = await latestVideoResponse.json();
+        // Récupérer la dernière vidéo publiée
+        const latestVideoUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&order=date&type=video&key=${GOOGLE_API_KEY}`;
+        const latestVideoResponse = await fetch(latestVideoUrl);
+        const latestVideoData = await latestVideoResponse.json();
 
-        let latestVideo = null;
-        if (latestVideoData.items && latestVideoData.items.length > 0) {
-            latestVideo = {
-                videoId: latestVideoData.items[0].id.videoId,
-                title: latestVideoData.items[0].snippet.title,
-                thumbnail: latestVideoData.items[0].snippet.thumbnails.medium.url,
-                url: `https://www.youtube.com/watch?v=${latestVideoData.items[0].id.videoId}`
-            };
-        }
+        let latestVideo = null;
+        if (latestVideoData.items && latestVideoData.items.length > 0) {
+            latestVideo = {
+                videoId: latestVideoData.items[0].id.videoId,
+                title: latestVideoData.items[0].snippet.title,
+                thumbnail: latestVideoData.items[0].snippet.thumbnails.medium.url,
+                url: `https://www.youtube.com/watch?v=${latestVideoData.items[0].id.videoId}`
+            };
+        }
 
-        // Récupérer la vidéo la plus populaire
-        const popularVideoUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&order=viewCount&type=video&key=${GOOGLE_API_KEY}`;
-        const popularVideoResponse = await fetch(popularVideoUrl);
-        const popularVideoData = await popularVideoResponse.json();
+        // Récupérer la vidéo la plus populaire
+        const popularVideoUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&order=viewCount&type=video&key=${GOOGLE_API_KEY}`;
+        const popularVideoResponse = await fetch(popularVideoUrl);
+        const popularVideoData = await popularVideoResponse.json();
 
-        let popularVideo = null;
-        if (popularVideoData.items && popularVideoData.items.length > 0) {
-            popularVideo = {
-                videoId: popularVideoData.items[0].id.videoId,
-                title: popularVideoData.items[0].snippet.title,
-                thumbnail: popularVideoData.items[0].snippet.thumbnails.medium.url,
-                url: `https://www.youtube.com/watch?v=${popularVideoData.items[0].id.videoId}`
-            };
-        }
+        let popularVideo = null;
+        if (popularVideoData.items && popularVideoData.items.length > 0) {
+            popularVideo = {
+                videoId: popularVideoData.items[0].id.videoId,
+                title: popularVideoData.items[0].snippet.title,
+                thumbnail: popularVideoData.items[0].snippet.thumbnails.medium.url,
+                url: `https://www.youtube.com/watch?v=${popularVideoData.items[0].id.videoId}`
+            };
+        }
 
-        // Retourner toutes les informations en JSON
-        res.json({
-            channelId,
-            subscribers,
-            totalViews,
-            totalVideos,
-            latestVideo,
-            popularVideo
-        });
+        // Retourner toutes les informations en JSON
+        res.json({
+            channelId,
+            subscribers,
+            totalViews,
+            totalVideos,
+            latestVideo,
+            popularVideo
+        });
 
-    } catch (error) {
-        console.error(" Erreur API YouTube :", error);
-        res.status(500).json({ error: "Erreur serveur YouTube." });
-    }
+    } catch (error) {
+        console.error(" Erreur API YouTube :", error);
+        res.status(500).json({ error: "Erreur serveur YouTube." });
+    }
 });
 
 
@@ -216,88 +216,88 @@ app.get("/youtube-channel-info", async (req, res) => {
 
 
 
- // Faire de recherche d'actualités avec Perplexity AI
+ // Faire de recherche d'actualités avec Perplexity AI
 
 
 
 // Fonction pour récupérer les dernières actualités avec `companyWebsite`
 async function getLatestNews(companyWebsite) {
-    if (!PERPLEXITY_API_KEY) {
-        return { error: "Clé API Perplexity non définie." };
-    }
+    if (!PERPLEXITY_API_KEY) {
+        return { error: "Clé API Perplexity non définie." };
+    }
 
-    try {
-        console.log(` Recherche des dernières actualités pour : ${companyWebsite}`);
+    try {
+        console.log(` Recherche des dernières actualités pour : ${companyWebsite}`);
 
-        const response = await axios.post(
-            "https://api.perplexity.ai/chat/completions",
-    {
-        model: "sonar-pro",
-        max_tokens: 600,  // Limite la réponse à 600 tokens (ajuste si nécessaire)
-        messages: [
-            { role: "system", content: "Provide structured, concise responses." },
-            { role: "user", content: `Find recent news about ${companyWebsite} from blogs, press releases, or news sources.
+        const response = await axios.post(
+            "https://api.perplexity.ai/chat/completions",
+    {
+        model: "sonar-pro",
+        max_tokens: 600,  // Limite la réponse à 600 tokens (ajuste si nécessaire)
+        messages: [
+            { role: "system", content: "Provide structured, concise responses." },
+            { role: "user", content: `Find recent news about ${companyWebsite} from blogs, press releases, or news sources.
 
-            Return only JSON:
-          
-            {
-              "dernières_actualités": [
-                {
-                  "title": "...", The headline (max **100** characters).
-                  "description": "...",  A **short** summary (max **150** characters).
-                  "source": "...",  Name of the source (e.g., "BBC News")
-                  "url": "...", The **direct** link to the news article (**fully valid and untruncated**
-                  "date": "...",  Format: YYYY-MM-DD
-                  "tags": ["..."], Up to Relevant tags like "Funding", "Acquisition", "New Product"
-                }
-              ]
-            }
+            Return only JSON:
+          
+            {
+              "dernières_actualités": [
+                {
+                  "title": "...", The headline (max **100** characters).
+                  "description": "...",  A **short** summary (max **150** characters).
+                  "source": "...",  Name of the source (e.g., "BBC News")
+                  "url": "...", The **direct** link to the news article (**fully valid and untruncated**
+                  "date": "...",  Format: YYYY-MM-DD
+                  "tags": ["..."], Up to Relevant tags like "Funding", "Acquisition", "New Product"
+                }
+              ]
+            }
 
-       
-            - Limit response to 3 items.` }
-        ]
-    },
-            {
-                headers: {
-                    "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                }
-            }
-        );
+       
+            - Limit response to 3 items.` }
+        ]
+    },
+            {
+                headers: {
+                    "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            }
+        );
 
-        if (!response.data || !response.data.choices) {
-            return { error: "Réponse invalide de Perplexity AI" };
-        }
+        if (!response.data || !response.data.choices) {
+            return { error: "Réponse invalide de Perplexity AI" };
+        }
 
-        // Vérification et parsing de la réponse
-        const parsedResponse = response.data.choices[0].message.content;
-        try {
-            const newsData = JSON.parse(parsedResponse);
-            return newsData;
-        } catch (jsonError) {
-            console.error(" Erreur de parsing JSON :", parsedResponse);
-            return { error: "Format de réponse non valide." };
-        }
+        // Vérification et parsing de la réponse
+        const parsedResponse = response.data.choices[0].message.content;
+        try {
+            const newsData = JSON.parse(parsedResponse);
+            return newsData;
+        } catch (jsonError) {
+            console.error(" Erreur de parsing JSON :", parsedResponse);
+            return { error: "Format de réponse non valide." };
+        }
 
-    } catch (error) {
-        console.error(" Erreur API Perplexity :", error.response ? error.response.data : error.message);
-        return { error: "Erreur API Perplexity" };
-    }
+    } catch (error) {
+        console.error(" Erreur API Perplexity :", error.response ? error.response.data : error.message);
+        return { error: "Erreur API Perplexity" };
+    }
 }
 
 
 
 // Route API pour récupérer les actualités d'une entreprise avec `companyWebsite`
 app.get("/api/company-info", async (req, res) => {
-    const companyWebsite = req.query.companyWebsite;
+    const companyWebsite = req.query.companyWebsite;
 
-    if (!companyWebsite) {
-        return res.status(400).json({ error: "Paramètre 'companyWebsite' requis" });
-    }
+    if (!companyWebsite) {
+        return res.status(400).json({ error: "Paramètre 'companyWebsite' requis" });
+    }
 
-    const news = await getLatestNews(companyWebsite);
-    res.json(news);
+    const news = await getLatestNews(companyWebsite);
+    res.json(news);
 });
 
 
@@ -571,12 +571,12 @@ async function executeNewsPrompts() {
 // 2e prompt : Fusions, acquisitions et alliances stratégiques
 
 `
-Récupérez les articles publiés le ${formattedDate} sur les opérations stratégiques dans l’industrie, ainsi que les autres actualités majeures du secteur.
+Récupérez les articles publiés ce mois-ci sur les opérations stratégiques dans l’industrie, ainsi que les autres actualités majeures du secteur.
 
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -592,7 +592,7 @@ Instructions importantes :
 // 2e prompt : Fusions, acquisitions et alliances stratégiques
 
 `
-Récupérez les articles publiés le ${formattedDate} sur les opérations stratégiques dans l’industrie :  
+Récupérez les articles publiés ce mois-ci sur les opérations stratégiques dans l’industrie :  
 
 - Fusions et acquisitions d’entreprises industrielles et fournisseurs.  
 - Partenariats stratégiques entre entreprises et startups industrielles.  
@@ -602,7 +602,7 @@ Récupérez les articles publiés le ${formattedDate} sur les opérations strat�
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -615,7 +615,7 @@ Instructions importantes :
 // 3e prompt : Innovations technologiques et transformation digitale
 
 `
-Récupérez les articles publiés le ${formattedDate} sur les nouvelles technologies dans l’industrie :  
+Récupérez les articles publiés ce mois-ci sur les nouvelles technologies dans l’industrie :  
 
 - Lancements de nouveaux équipements industriels majeurs, tels que les nouvelles générations d’avions (ex. Airbus A350 Neo), de véhicules électriques révolutionnaires (ex. Tesla Cybertruck), de machines de production avancées (ex. robots industriels collaboratifs), ou d’innovations technologiques de rupture. 
 - Déploiement d’applications logicielles pour l’industrie (SaaS, ERP, MES).  
@@ -627,7 +627,7 @@ Récupérez les articles publiés le ${formattedDate} sur les nouvelles technolo
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -640,7 +640,7 @@ Instructions importantes :
 // 4e prompt : Événements industriels et salons professionnels
 
 `
-Récupérez les articles publiés le ${formattedDate} sur les événements du secteur industriel :  
+Récupérez les articles publiés ce mois-ci sur les événements du secteur industriel :  
 
 - Salons industriels internationaux (Hannover Messe, CES, Industrie Paris, etc.).  
 - Conférences spécialisées en innovation et Industrie 4.0.  
@@ -651,7 +651,7 @@ Récupérez les articles publiés le ${formattedDate} sur les événements du se
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -664,7 +664,7 @@ Instructions importantes :
 // 5e prompt : Nominations et gestion des talents industriels
 
 `
-Récupérez les articles publiés le ${formattedDate} sur les changements de direction dans l’industrie :  
+Récupérez les articles publiés ce mois-ci sur les changements de direction dans l’industrie :  
 
 - Annonce de nouveaux PDG ou directeurs industriels.  
 - Changements stratégiques dans les grandes entreprises manufacturières.  
@@ -675,7 +675,7 @@ Récupérez les articles publiés le ${formattedDate} sur les changements de dir
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -688,7 +688,7 @@ Instructions importantes :
 // 6e prompt : Cybersécurité et protection des données industrielles
 
 `
-Récupérez les articles publiés le ${formattedDate} sur la cybersécurité dans l’industrie :  
+Récupérez les articles publiés ce mois-ci sur la cybersécurité dans l’industrie :  
 
 - Menaces récentes de cyberattaques sur les systèmes industriels.  
 - Nouveaux outils et solutions de cybersécurité pour l’Industrie 4.0.  
@@ -699,7 +699,7 @@ Récupérez les articles publiés le ${formattedDate} sur la cybersécurité dan
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -712,7 +712,7 @@ Instructions importantes :
 // 7e prompt : IoT industriel et connectivité avancée
 
 `
-Récupérez les articles publiés le ${formattedDate} sur l’Internet des objets dans l’industrie :  
+Récupérez les articles publiés ce mois-ci sur l’Internet des objets dans l’industrie :  
 
 - Nouveaux capteurs et équipements IoT pour les usines.  
 - Impact de la 5G sur la connectivité industrielle.  
@@ -723,7 +723,7 @@ Récupérez les articles publiés le ${formattedDate} sur l’Internet des objet
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -736,7 +736,7 @@ Instructions importantes :
 // 8e prompt : Développement durable et transition énergétique
 
 `
-Récupérez les articles publiés le ${formattedDate} sur la durabilité industrielle :  
+Récupérez les articles publiés ce mois-ci sur la durabilité industrielle :  
 
 - Solutions d’efficacité énergétique pour les usines.  
 - Adoption des énergies renouvelables dans les sites industriels.  
@@ -747,7 +747,7 @@ Récupérez les articles publiés le ${formattedDate} sur la durabilité industr
 Instructions importantes :  
 - Fournir jusqu'à 10 articles uniques et pertinents.  
 - Tous les articles doivent provenir de sources reconnues et fiables et avoir une URL valide.  
-- Retourner uniquement les articles publiés le ${formattedDate}.  
+- Retourner uniquement les articles publiés ce mois-ci.  
 - Exclure les articles qui ne correspondent pas aux critères de date.  
 - Tous les articles doivent être uniques (pas de doublons).  
 - Chaque article doit être traité uniquement dans sa langue d'origine.  
@@ -761,12 +761,12 @@ Instructions importantes :
 // 1st prompt: Strategic Operations in Industry  
 
 `
-Retrieve articles published on ${formattedDate} about strategic operations in the industry, as well as other major industry news.  
+Retrieve articles published this month about strategic operations in the industry, as well as other major industry news.  
 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published on ${formattedDate}.  
+- Return only articles published this month.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -779,7 +779,7 @@ Important Instructions:
 // 2nd prompt: Mergers, Acquisitions, and Strategic Alliances  
 
 `
-Retrieve articles published on ${formattedDate} about strategic operations in the industry:  
+Retrieve articles published this month about strategic operations in the industry:  
 
 - Mergers and acquisitions of industrial companies and suppliers.  
 - Strategic partnerships between industrial enterprises and startups.  
@@ -789,7 +789,7 @@ Retrieve articles published on ${formattedDate} about strategic operations in th
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published on ${formattedDate}.  
+- Return only articles published this month.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -802,7 +802,7 @@ Important Instructions:
 // 3rd prompt: Technological Innovations and Digital Transformation  
 
 `
-Retrieve articles published on ${formattedDate} about new technologies in the industry:  
+Retrieve articles published this month about new technologies in the industry:  
 
 - Launch of major new industrial equipment, such as next-generation aircraft (e.g., Airbus A350 Neo), revolutionary electric vehicles (e.g., Tesla Cybertruck), advanced manufacturing machines (e.g., collaborative industrial robots), or disruptive technological innovations.  
 - Deployment of industrial software applications (SaaS, ERP, MES).  
@@ -814,7 +814,7 @@ Retrieve articles published on ${formattedDate} about new technologies in the in
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published on ${formattedDate}.  
+- Return only articles published this month.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -827,7 +827,7 @@ Important Instructions:
 // 4th prompt: Industrial Events and Trade Shows  
 
 `
-Retrieve articles published on ${formattedDate} about industrial events:  
+Retrieve articles published this month about industrial events:  
 
 - International industrial trade shows (Hannover Messe, CES, Industrie Paris, etc.).  
 - Specialized conferences on innovation and Industry 4.0.  
@@ -838,7 +838,7 @@ Retrieve articles published on ${formattedDate} about industrial events:
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published on ${formattedDate}.  
+- Return only articles published this month.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -851,7 +851,7 @@ Important Instructions:
 // 5th prompt: Executive Appointments and Talent Management in Industry  
 
 `
-Retrieve articles published on ${formattedDate} about leadership changes in the industry:  
+Retrieve articles published this month about leadership changes in the industry:  
 
 - Announcement of new CEOs or industrial directors.  
 - Strategic shifts in major manufacturing companies.  
@@ -861,7 +861,7 @@ Retrieve articles published on ${formattedDate} about leadership changes in the 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published on ${formattedDate}.  
+- Return only articles published this month.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -874,7 +874,7 @@ Important Instructions:
 // 6th prompt: Cybersecurity and Data Protection in Industry  
 
 `
-Retrieve articles published on ${formattedDate} about cybersecurity in the industry:  
+Retrieve articles published this month about cybersecurity in the industry:  
 
 - Recent cyber threats targeting industrial systems.  
 - New cybersecurity tools and solutions for Industry 4.0.  
@@ -885,7 +885,7 @@ Retrieve articles published on ${formattedDate} about cybersecurity in the indus
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published on ${formattedDate}.  
+- Return only articles published this month.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -898,7 +898,7 @@ Important Instructions:
 // 7th prompt: Industrial IoT and Advanced Connectivity  
 
 `
-Retrieve articles published on ${formattedDate} about the Internet of Things in industry:  
+Retrieve articles published this month about the Internet of Things in industry:  
 
 - New sensors and IoT equipment for factories.  
 - Impact of 5G on industrial connectivity.  
@@ -909,7 +909,7 @@ Retrieve articles published on ${formattedDate} about the Internet of Things in 
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published on ${formattedDate}.  
+- Return only articles published this month.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -922,7 +922,7 @@ Important Instructions:
 // 8th prompt: Sustainability and Energy Transition in Industry  
 
 `
-Retrieve articles published on ${formattedDate} about industrial sustainability:  
+Retrieve articles published this month about industrial sustainability:  
 
 - Energy efficiency solutions for factories.  
 - Adoption of renewable energy in industrial sites.  
@@ -933,7 +933,7 @@ Retrieve articles published on ${formattedDate} about industrial sustainability:
 Important Instructions:  
 - Provide up to 10 unique and relevant articles.  
 - All articles must come from recognized and reliable sources with a valid URL.  
-- Return only articles published on ${formattedDate}.  
+- Return only articles published this month.  
 - Exclude articles that do not match the specified date criteria.  
 - All articles must be unique (no duplicates).  
 - Each article should be processed only in its original language.  
@@ -1365,7 +1365,8 @@ if (!relevant) {
       });
     }
 
-*/
+
+
 
     // Vérifier si l'article existe déjà en base
     const [article, created] = await Article.findOrCreate({
@@ -1471,7 +1472,7 @@ app.get("/api/last-update", async (req, res) => {
 
 // Lancer le serveur Express
 app.listen(PORT, () => {
-    console.log(` Serveur en écoute sur http://localhost:${PORT}`);
+    console.log(` Serveur en écoute sur http://localhost:${PORT}`);
 });
 
 
